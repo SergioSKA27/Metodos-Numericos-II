@@ -166,14 +166,15 @@ class Matrix:
         dx = 0
         for i in range(0,self.rows):
             exmat = self.extract(0,i)
-            #print(exmat)
+            print(exmat)
             d = exmat.det()
-            if i & 1 == 0:
-                dx = dx + ((d*self.matrix[0][i])*-1)
+            print(d,'det')
+            if i % 2 == 0:
+                dx = dx + ((d*self.matrix[0][i]))
             else:
-                dx = dx + (d*self.matrix[0][i])
+                dx = dx + ((d*self.matrix[0][i])*(-1))
 
-            #print(i,"i,j,k,...",self.matrix[0][i])
+            print(i,"i,j,k,...",self.matrix[0][i], "-> " , dx)
         return dx
 
     def determinat(self):
@@ -217,17 +218,17 @@ class Matrix:
 
 
         adj = self.adjoint()
-        print(adj)
+        #print(adj)
         adjt = adj.transpose()
-        print(adjt)
-        det = self.determinat()
+        #print(adjt)
+        det = self.det()
         print(det)
         mat = []
 
         if det == 0:
             raise Exception("the matrix determinant is zero")
         det = 1/det
-        print(det)
+        #print(det)
 
         for i in range(0,self.rows):
             aux = []

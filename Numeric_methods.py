@@ -220,7 +220,7 @@ class Matrix:
         print(adj)
         adjt = adj.transpose()
         print(adjt)
-        det = adjt.determinat()
+        det = self.determinat()
         print(det)
         mat = []
 
@@ -299,7 +299,7 @@ mt = Matrix(m)
 mt2 = Matrix(m2)
 mt2inv = mt2.inverse()
 print(mt2)
-print(mt2inv)
+print(mt2inv*mt2)
 # Create the Window
 #window = sg.Window('Métodos Numéricos ', layout,size=(720,480))
 # Event Loop to process "events" and get the "values" of the inputs

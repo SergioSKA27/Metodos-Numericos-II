@@ -11,7 +11,8 @@ sg.theme('DarkGreen')
 
 
 
-# The Matrix class takes in a matrix and allows you to add, subtract, and multiply matrices
+# It's a class that represents a matrix and has functions that allow you to add, subtract, multiply, and find the inverse
+# of a matrix
 class Matrix:
 
     def __init__(self, matrix):
@@ -24,7 +25,6 @@ class Matrix:
         self.matrix = matrix
         self.rows = len(matrix)
         self.columns = len(matrix[0])
-
 
     def __repr__(self):
         """
@@ -119,6 +119,22 @@ class Matrix:
         """
         return self.matrix[row]
 
+    def printeq_sys(self,v):
+        """
+        It takes a matrix and a vector and returns a string that is the matrix and vector printed in a way that is easy to
+        read
+
+        :param v: the vector of values
+        :return: The matrix is being returned.
+        """
+        mat = ''
+        for i in range(0,self.rows):
+            for j in range(0,self.columns):
+                mat = mat + str(self.matrix[i][j])+' '
+            mat = mat + "|"+str(v[i])
+            mat = mat + "\n"
+        return mat
+
     def transpose(self):
         """
         It transposes the matrix.
@@ -166,15 +182,15 @@ class Matrix:
         dx = 0
         for i in range(0,self.rows):
             exmat = self.extract(0,i)
-            print(exmat)
+            #print(exmat)
             d = exmat.det()
-            print(d,'det')
+            #print(d,'det')
             if i % 2 == 0:
                 dx = dx + ((d*self.matrix[0][i]))
             else:
                 dx = dx + ((d*self.matrix[0][i])*(-1))
 
-            print(i,"i,j,k,...",self.matrix[0][i], "-> " , dx)
+            #print(i,"i,j,k,...",self.matrix[0][i], "-> " , dx)
         return dx
 
     def determinat(self):
@@ -199,7 +215,7 @@ class Matrix:
             for j in range(0,self.columns):
                 mc = self.extract(i,j)
                 mcd = mc.determinat()
-                if ((i+1) + (j+1)) & 1:
+                if ((i+1) + (j+1)) % 2 != 0:
                     aux.append((-1)*mcd)
                 else:
                     aux.append(mcd)
@@ -222,7 +238,7 @@ class Matrix:
         adjt = adj.transpose()
         #print(adjt)
         det = self.det()
-        print(det)
+        #print(det)
         mat = []
 
         if det == 0:
@@ -237,6 +253,94 @@ class Matrix:
             mat.append(aux)
 
         return Matrix(mat)
+
+    def move_row(self, from_row,to_row):
+        """
+        It takes the row from_row and moves it to row to_row
+
+        :param from_row: the row you want to move
+        :param to_row: The row you want to move to
+        """
+        a = self.matrix[from_row]
+        b = self.matrix[to_row]
+        self.matrix[from_row] = b
+        self.matrix[to_row] = a
+
+
+
+def gaussj_method(pivot, matrix,solutionv):
+
+    maxm = matrix[pivot][pivot]
+    row = pivot
+
+
+    for i in range(pivot,matrix.rows):
+        if (abs(maxm) < abs(matrix[i][pivot]) ):
+            maxm = matrix[i][pivot]
+            row = i
+
+    matrix.move_row(row,pivot)
+    aux = solutionv[row]
+    solutionv[row] = solutionv[pivot]
+    solutionv[pivot] = aux
+
+    if row != pivot:
+        print("R",pivot+1,"<----> R",row+1)
+
+
+
+    print(matrix.printeq_sys(solutionv))
+
+
+    if matrix[pivot][pivot] != 1:
+        a = matrix[pivot][pivot]
+        for i in range(pivot,matrix.columns):
+            #print(matrix[pivot][i])
+            matrix[pivot][i] = matrix[pivot][i]/a
+        solutionv[pivot] = solutionv[pivot]/a
+
+        print("(1/",a,")R",pivot+1,"-----> R",pivot)
+
+    print(matrix.printeq_sys(solutionv))
+
+    for i in range(pivot+1,matrix.rows):
+        pt = -1*matrix[i][pivot]
+        print(pt,"R",pivot+1,"+ R",i+1,"------> R",i+1)
+        for j in range(pivot,matrix.columns):
+            #print(pt)
+            matrix[i][j] = matrix[i][j]+((pt)*matrix[pivot][j])
+
+        solutionv[i] = solutionv[i]+((pt)*solutionv[pivot])
+
+    print(matrix.printeq_sys(solutionv))
+
+
+
+def gauss_jordan(matrix,solutionv):
+    for i in range(0,matrix.rows):
+        gaussj_method(i,matrix,solutionv)
+
+    x = []
+
+    for r in range(matrix.rows-1,-1,-1):
+        if matrix[r][r] == 1:
+            if r == matrix.rows-1:
+                x.append(solutionv[r])
+            else:
+                sum = 0
+                for j in x:
+                    for k in range(r+1,matrix.columns):
+                        sum = sum+(j*matrix[r][k])
+
+                sum = sum*-1
+                x.append((sum+solutionv[r])/matrix[r][r])
+
+    x.reverse()
+    for i in range(0,matrix.rows):
+        print("x_",i," = ", x[i])
+
+
+
 
 
 
@@ -278,9 +382,10 @@ sg.Button('Métodos de Factorización',size=(10,5),key='-LinearFactorButton-')],
 
 [sg.Text('')],
 
-[sg.Button('Métodos Generales para Matrices',size=(10,5),key='-AproximationsButton-')]
+[sg.Button('Métodos Generales para Matrices',size=(10,5),key='-MatrixAppButton-')]
 ]
 
+layout2 = []
 
 
 
@@ -294,27 +399,30 @@ layout = [
 
 
 
-m = [[1,2,3,4],[2,3,5,6],[2,6,5,6],[2,325,6,3]]
-m2 = [[2,0,1],[3,0,0],[5,1,1]]
+m = [[1,2,3,4],[2,3,4,6],[2,6,5,6],[2,325,6,3]]
+m2 = [[3,81,1],[100,8,74],[300,14,102]]
+b = [1,2,3,4]
 mt = Matrix(m)
 mt2 = Matrix(m2)
 mt2inv = mt2.inverse()
+
 print(mt2)
-print(mt2inv*mt2)
+gauss_jordan(mt2,[1,2,3])
+#print(mt2)
 # Create the Window
-#window = sg.Window('Métodos Numéricos ', layout,size=(720,480))
-# Event Loop to process "events" and get the "values" of the inputs
-#while True:
-#    event, values = window.read()
-#    if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
-#        break
-#
-#
-#    if event == '-LinearEqButton-':
-#        window['-COL{0}-'].update(visible=False)
-#        window['-COL{1}-'].update(visible=True)
-#
-#    print('You entered ', event)
-#
-#window.close()
-#
+window = sg.Window('Métodos Numéricos ', layout,size=(720,480))
+#Event Loop to process "events" and get the "values" of the inputs
+while True:
+    event, values = window.read()
+    if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
+        break
+
+
+    if event == '-LinearEqButton-':
+        window['-COL{0}-'].update(visible=False)
+        window['-COL{1}-'].update(visible=True)
+
+    print('You entered ', event)
+
+window.close()
+

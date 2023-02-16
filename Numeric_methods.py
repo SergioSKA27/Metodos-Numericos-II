@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import PySimpleGUI as sg
 import sys
-
+from sympy import *
 
 
 
@@ -19,7 +19,6 @@ class Matrix:
         """
         The function takes a matrix as an argument and assigns the number of rows and columns to the variables self.rows and
         self.columns
-
         :param matrix: the matrix we're going to be working with
         """
         self.matrix = matrix
@@ -41,7 +40,7 @@ class Matrix:
         mat = ''
         for i in range(0,self.rows):
             for j in range(0,self.columns):
-                mat = mat + str(self.matrix[i][j])+' '
+                mat = mat + str(self.matrix[i][j])+'\t '
             mat = mat + "\n"
         return mat
 
@@ -49,7 +48,6 @@ class Matrix:
         """
         It takes two matrices, checks if they have the same size, and if they do, it adds them together and returns the
         result
-
         :param other: The other matrix to add to this one
         :return: A new matrix with the sum of the two matrices
         """
@@ -69,7 +67,6 @@ class Matrix:
     def __sub__(self,other):
         """
         It subtracts two matrices.
-
         :param other: The other matrix to be subtracted from the current matrix
         :return: A new matrix with the subtraction of the two matrices.
         """
@@ -90,7 +87,6 @@ class Matrix:
         """
         For each row in the first matrix, multiply each element in that row by the corresponding element in the column of
         the second matrix, and sum the results
-
         :param other: The other matrix to multiply with
         :return: A matrix
         """
@@ -112,7 +108,6 @@ class Matrix:
     def __getitem__(self, row):
         """
         The function takes in a row and column number and returns the value at that position in the matrix
-
         :param row: The row of the matrix you want to access
         :param column: The column number to return
         :return: The value of the matrix at the given row and column.
@@ -123,7 +118,6 @@ class Matrix:
         """
         It takes a matrix and a vector and returns a string that is the matrix and vector printed in a way that is easy to
         read
-
         :param v: the vector of values
         :return: The matrix is being returned.
         """
@@ -151,7 +145,6 @@ class Matrix:
     def extract(self,row,column):
         """
         It returns a matrix with the row and column removed.
-
         :param row: The row to be removed
         :param column: The column to be removed
         :return: A matrix with the row and column removed.
@@ -257,7 +250,6 @@ class Matrix:
     def move_row(self, from_row,to_row):
         """
         It takes the row from_row and moves it to row to_row
-
         :param from_row: the row you want to move
         :param to_row: The row you want to move to
         """
@@ -399,16 +391,87 @@ layout = [
 
 
 
-m = [[1,2,3,4],[2,3,4,6],[2,6,5,6],[2,325,6,3]]
-m2 = [[3,81,1],[100,8,74],[300,14,102]]
-b = [1,2,3,4]
-mt = Matrix(m)
-mt2 = Matrix(m2)
-mt2inv = mt2.inverse()
+#m = [[1,2,3,4],[2,3,4,6],[2,6,5,6],[2,325,6,3]]
+#m2 = [[3,81,1],[100,8,74],[300,14,102]]
+#b = [1,2,3,4]
+#mt = Matrix(m)
+#mt2 = Matrix(m2)
+#mt2inv = mt2.inverse()
 
-print(mt2)
-gauss_jordan(mt2,[1,2,3])
 #print(mt2)
+#gauss_jordan(mt2,[1,2,3])
+#print(mt2)
+x,y,z = symbols('x,y,z')
+symb = [x,y,z]
+expr1 = x**2 + 2*y -z
+expr2 = x**2 + 2*y
+expr3 = x**2*(2*y**2)
+ff = [expr1,expr2,expr3]
+print(ff)
+
+
+
+
+def jacobian(ff,symb):
+    """
+    It takes a vector of functions and a vector of symbols and returns the Jacobian matrix of the functions with respect to
+    the symbols
+
+    :param ff: the function
+    :param symb: the symbols that are used in the function
+    :return: A matrix of the partial derivatives of the function with respect to the variables.
+    """
+    m = []
+
+    for i in range(0,len(ff)):
+        aux  = []
+        for j in range(0,len(symb)):
+            aux.append(diff(ff[i],symb[j]))
+        m.append(aux)
+
+    return Matrix(m)
+
+
+def hessian(ff,symb):
+    """
+    It takes a vector of functions and a vector of symbols and returns the Hessian matrix of the functions with respect to
+    the symbols
+
+    :param ff: a list of functions of the form f(x,y,z)
+    :param symb: the symbols that are used in the function
+    :return: A matrix of the second derivatives of the function.
+    """
+
+    m = []
+
+    for i in range(0,len(ff)):
+        aux  = []
+        for j in range(0,len(symb)):
+            aux.append(diff(ff[i],symb[j],2))
+        m.append(aux)
+    return Matrix(m)
+
+
+def eval_matrix(matrix , v):
+    e = 0
+    mm = []
+    for i in range(0,3):
+        aux = []
+        for j in range(0,3):
+            aux.append(matrix[i][j].subs([(x,v[0]),(y,v[1]),(z,[2])]).evalf())
+        mm.append(aux)
+    return Matrix(mm)
+
+
+
+
+j = jacobian(ff,symb)
+je = eval_matrix(j,[0,1,2])
+print(j.inverse())
+
+
+
+
 # Create the Window
 window = sg.Window('Métodos Numéricos ', layout,size=(720,480))
 #Event Loop to process "events" and get the "values" of the inputs
@@ -425,4 +488,3 @@ while True:
     print('You entered ', event)
 
 window.close()
-

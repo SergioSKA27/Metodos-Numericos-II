@@ -806,11 +806,6 @@ layout5 = [
 [sg.Button('<--',size=(2,2),key='returnL1-L5'),
 sg.Text('METODOS PARA MATRICES')],
 
-[sg.Text('FILAS ') ,sg.Text('        ' ),sg.Text('COLUMNAS')],
-
-[sg.Combo([i for i in range(2,11)],key='-RowsSize-'),sg.Text('        ' ),
-    sg.Combo([i for i in range(2,11)],key='-ColsSize-')],
-
 [sg.Button('Operaciones Basicas Para Matrices',size=(10,5),key='-BasicMatrixMethods-'),
 sg.Text('          '),
 sg.Button('Matriz Inversa',size=(10,5),key='-InverseMethod-'),
@@ -821,7 +816,304 @@ sg.Button('Matriz Adjunta',size=(10,5),key='-AdjointMethod-')],
 
 [sg.Button('Matriz Traspuesta',size=(10,5),key='-TransposeMethod-'),
 sg.Text('          '),
-sg.Button('Determinant',size=(10,5),key='-Determinant method-')]
+sg.Button('Determinante',size=(10,5),key='-Determinantmethod-')]
+]
+
+layout5_1 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL5-L5_1'),sg.Text('Operaciones Con Matrices')],
+
+[
+sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+sg.Text('   '),
+sg.Input('',key='-M200-',size=(4,4)), sg.Input('',key='-M201-',size=(4,4)),sg.Input('',key='-M202-',size=(4,4)),
+sg.Input('',key='-M203-',size=(4,4)),sg.Input('',key='-M204-',size=(4,4)),sg.Input('',key='-M205-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+sg.Text('   '),
+sg.Input('',key='-M210-',size=(4,4)), sg.Input('',key='-M211-',size=(4,4)),sg.Input('',key='-M212-',size=(4,4)),
+sg.Input('',key='-M213-',size=(4,4)),sg.Input('',key='-M214-',size=(4,4)),sg.Input('',key='-M215-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+sg.Text(' + ',key='-opmatrix-'),
+sg.Input('',key='-M220-',size=(4,4)), sg.Input('',key='-M221-',size=(4,4)),sg.Input('',key='-M222-',size=(4,4)),
+sg.Input('',key='-M223-',size=(4,4)),sg.Input('',key='-M224-',size=(4,4)),sg.Input('',key='-M225-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+sg.Text('   '),
+sg.Input('',key='-M230-',size=(4,4)), sg.Input('',key='-M231-',size=(4,4)),sg.Input('',key='-M232-',size=(4,4)),
+sg.Input('',key='size=(5,5)M233-',size=(4,4)),sg.Input('',key='-M234-',size=(4,4)),sg.Input('',key='-M235-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+sg.Text('   '),
+sg.Input('',key='-M240-',size=(4,4)), sg.Input('',key='-M241-',size=(4,4)),sg.Input('',key='-M242-',size=(4,4)),
+sg.Input('',key='-M243-',size=(4,4)),sg.Input('',key='-M244-',size=(4,4)),sg.Input('',key='-M245-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+sg.Text('   '),
+sg.Input('',key='-M250-',size=(4,4)), sg.Input('',key='-M251-',size=(4,4)),sg.Input('',key='-M252-',size=(4,4)),
+sg.Input('',key='-M253-',size=(4,4)),sg.Input('',key='-M254-',size=(4,4)),sg.Input('',key='-M255-',size=(4,4)),
+],
+
+[sg.Button('+',size=(3,3),key='-matsum-'),sg.Button('-',size=(3,3),key='-matdif-'),
+sg.Button('*',size=(3,3),key='-matmul-'),sg.Button('Calcular',size=(7,3),key='-CalcMatOp-')],
+
+[sg.Text('RESULTADO')],
+
+[
+sg.Input('',key='-MR00-',size=(4,4)), sg.Input('',key='-MR01-',size=(4,4)),sg.Input('',key='-MR02-',size=(4,4)),
+sg.Input('',key='-MR03-',size=(4,4)),sg.Input('',key='-MR04-',size=(4,4)),sg.Input('',key='-MR05-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR10-',size=(4,4)), sg.Input('',key='-MR11-',size=(4,4)),sg.Input('',key='-MR12-',size=(4,4)),
+sg.Input('',key='-MR13-',size=(4,4)),sg.Input('',key='-MR14-',size=(4,4)),sg.Input('',key='-MR15-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR20-',size=(4,4)), sg.Input('',key='-MR21-',size=(4,4)),sg.Input('',key='-MR22-',size=(4,4)),
+sg.Input('',key='-MR23-',size=(4,4)),sg.Input('',key='-MR24-',size=(4,4)),sg.Input('',key='-MR25-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR30-',size=(4,4)), sg.Input('',key='-MR31-',size=(4,4)),sg.Input('',key='-MR32-',size=(4,4)),
+sg.Input('',key='-MR33-',size=(4,4)),sg.Input('',key='-MR34-',size=(4,4)),sg.Input('',key='-MR35-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR40-',size=(4,4)), sg.Input('',key='-MR41-',size=(4,4)),sg.Input('',key='-MR42-',size=(4,4)),
+sg.Input('',key='-MR43-',size=(4,4)),sg.Input('',key='-MR44-',size=(4,4)),sg.Input('',key='-MR45-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR50-',size=(4,4)), sg.Input('',key='-MR51-',size=(4,4)),sg.Input('',key='-MR52-',size=(4,4)),
+sg.Input('',key='-MR53-',size=(4,4)),sg.Input('',key='-MR54-',size=(4,4)),sg.Input('',key='-MR55-',size=(4,4)),
+],
+
+
+]
+
+layout5_2 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL5-L5_2'),sg.Text('Matriz Inversa')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+],
+
+[sg.Button('Calcular',key='-CalcInverseMat-',size=(7,3))],
+[sg.Text('RESULTADO')],
+
+[
+sg.Input('',key='-MR00-',size=(4,4)), sg.Input('',key='-MR01-',size=(4,4)),sg.Input('',key='-MR02-',size=(4,4)),
+sg.Input('',key='-MR03-',size=(4,4)),sg.Input('',key='-MR04-',size=(4,4)),sg.Input('',key='-MR05-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR10-',size=(4,4)), sg.Input('',key='-MR11-',size=(4,4)),sg.Input('',key='-MR12-',size=(4,4)),
+sg.Input('',key='-MR13-',size=(4,4)),sg.Input('',key='-MR14-',size=(4,4)),sg.Input('',key='-MR15-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR20-',size=(4,4)), sg.Input('',key='-MR21-',size=(4,4)),sg.Input('',key='-MR22-',size=(4,4)),
+sg.Input('',key='-MR23-',size=(4,4)),sg.Input('',key='-MR24-',size=(4,4)),sg.Input('',key='-MR25-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR30-',size=(4,4)), sg.Input('',key='-MR31-',size=(4,4)),sg.Input('',key='-MR32-',size=(4,4)),
+sg.Input('',key='-MR33-',size=(4,4)),sg.Input('',key='-MR34-',size=(4,4)),sg.Input('',key='-MR35-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR40-',size=(4,4)), sg.Input('',key='-MR41-',size=(4,4)),sg.Input('',key='-MR42-',size=(4,4)),
+sg.Input('',key='-MR43-',size=(4,4)),sg.Input('',key='-MR44-',size=(4,4)),sg.Input('',key='-MR45-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR50-',size=(4,4)), sg.Input('',key='-MR51-',size=(4,4)),sg.Input('',key='-MR52-',size=(4,4)),
+sg.Input('',key='-MR53-',size=(4,4)),sg.Input('',key='-MR54-',size=(4,4)),sg.Input('',key='-MR55-',size=(4,4)),
+],
+
+
+
+]
+
+layout5_3 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL5-L5_3'),sg.Text('Matriz Adjunta')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+],
+
+
+[sg.Button('Calcular',key='-CalcAdjointMat-',size=(7,3))],
+[sg.Text('RESULTADO')],
+
+[
+sg.Input('',key='-MR00-',size=(4,4)), sg.Input('',key='-MR01-',size=(4,4)),sg.Input('',key='-MR02-',size=(4,4)),
+sg.Input('',key='-MR03-',size=(4,4)),sg.Input('',key='-MR04-',size=(4,4)),sg.Input('',key='-MR05-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR10-',size=(4,4)), sg.Input('',key='-MR11-',size=(4,4)),sg.Input('',key='-MR12-',size=(4,4)),
+sg.Input('',key='-MR13-',size=(4,4)),sg.Input('',key='-MR14-',size=(4,4)),sg.Input('',key='-MR15-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR20-',size=(4,4)), sg.Input('',key='-MR21-',size=(4,4)),sg.Input('',key='-MR22-',size=(4,4)),
+sg.Input('',key='-MR23-',size=(4,4)),sg.Input('',key='-MR24-',size=(4,4)),sg.Input('',key='-MR25-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR30-',size=(4,4)), sg.Input('',key='-MR31-',size=(4,4)),sg.Input('',key='-MR32-',size=(4,4)),
+sg.Input('',key='-MR33-',size=(4,4)),sg.Input('',key='-MR34-',size=(4,4)),sg.Input('',key='-MR35-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR40-',size=(4,4)), sg.Input('',key='-MR41-',size=(4,4)),sg.Input('',key='-MR42-',size=(4,4)),
+sg.Input('',key='-MR43-',size=(4,4)),sg.Input('',key='-MR44-',size=(4,4)),sg.Input('',key='-MR45-',size=(4,4)),
+],
+
+[
+sg.Input('',key='-MR50-',size=(4,4)), sg.Input('',key='-MR51-',size=(4,4)),sg.Input('',key='-MR52-',size=(4,4)),
+sg.Input('',key='-MR53-',size=(4,4)),sg.Input('',key='-MR54-',size=(4,4)),sg.Input('',key='-MR55-',size=(4,4)),
+],
+
+]
+
+
+layout5_4 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL5-L5_4'),sg.Text('Matriz Traspuesta')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+],
+
+
+[sg.Button('Calcular',key='-CalcTransposeMat-',size=(7,3))],
+[sg.Text('RESULTADO')],
+
+[sg.Multiline("",key='-LogTransposeM-',size=(100,100),horizontal_scroll=True)],
+
+
+
+]
+
+
+layout5_5 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL5-L5_5'),sg.Text('Determinante')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+],
+
+
+[sg.Button('Calcular',key='-CalcDetMat-',size=(7,3))],
+[sg.Text('RESULTADO')],
+
+[sg.Multiline("",key='-LogDetM-',size=(100,100),horizontal_scroll=True)],
+
+
+
 ]
 
 
@@ -862,6 +1154,11 @@ layout = [
 
 
     sg.Column(layout=layout5,key='-COL{5}-',visible=False),
+    sg.Column(layout=layout5_1,key='-COL{51}-',visible=False),
+    sg.Column(layout=layout5_2,key='-COL{52}-',visible=False),
+    sg.Column(layout=layout5_3,key='-COL{53}-',visible=False),
+    sg.Column(layout=layout5_4,key='-COL{54}-',visible=False),
+    sg.Column(layout=layout5_5,key='-COL{55}-',visible=False),
     ]
 ]
 
@@ -1031,6 +1328,27 @@ while True:
         window['-COL{1}-'].update(visible=False)
         window['-COL{5}-'].update(visible=True)
 
+    if event == '-BasicMatrixMethods-':
+        window['-COL{5}-'].update(visible=False)
+        window['-COL{51}-'].update(visible=True)
+
+    if event == '-InverseMethod-':
+        window['-COL{5}-'].update(visible=False)
+        window['-COL{52}-'].update(visible=True)
+
+    if event == '-AdjointMethod-':
+        window['-COL{5}-'].update(visible=False)
+        window['-COL{53}-'].update(visible=True)
+
+    if event == '-TransposeMethod-':
+        window['-COL{5}-'].update(visible=False)
+        window['-COL{54}-'].update(visible=True)
+
+    if event == '-Determinantmethod-':
+        window['-COL{5}-'].update(visible=False)
+        window['-COL{55}-'].update(visible=True)
+
+
 
 
 
@@ -1123,10 +1441,32 @@ while True:
             for j in range(0,6):
                 window.Element('-M'+str(i)+str(j)+'-').update(value='')
             window.Element('-B'+str(i)+'-').update(value='')
+
+
 #----------------------------------------------------------------
     if event == 'returnL1-L5':
         window['-COL{1}-'].update(visible=True)
         window['-COL{5}-'].update(visible=False)
+
+    if event == 'returnL5-L5_1':
+        window['-COL{5}-'].update(visible=True)
+        window['-COL{51}-'].update(visible=False)
+
+    if event == 'returnL5-L5_2':
+        window['-COL{5}-'].update(visible=True)
+        window['-COL{52}-'].update(visible=False)
+
+    if event == 'returnL5-L5_3':
+        window['-COL{5}-'].update(visible=True)
+        window['-COL{53}-'].update(visible=False)
+
+    if event == 'returnL5-L5_4':
+        window['-COL{5}-'].update(visible=True)
+        window['-COL{54}-'].update(visible=False)
+
+    if event == 'returnL5-L5_5':
+        window['-COL{5}-'].update(visible=True)
+        window['-COL{55}-'].update(visible=False)
 
 
 

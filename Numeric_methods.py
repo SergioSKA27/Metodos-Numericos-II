@@ -261,10 +261,18 @@ class Matrix:
 
 
 def gaussj_method(pivot, matrix,solutionv):
+    """
+    It takes a matrix, a pivot, and a solution vector, and it performs the Gauss-Jordan elimination method on the matrix,
+    using the pivot as the pivot, and the solution vector as the solution vector
+
+    :param pivot: the row we're currently working on
+    :param matrix: the matrix of the system
+    :param solutionv: the solution vector
+    """
 
     maxm = matrix[pivot][pivot]
     row = pivot
-
+    sreg = ""
 
     for i in range(pivot,matrix.rows):
         if (abs(maxm) < abs(matrix[i][pivot]) ):
@@ -277,11 +285,15 @@ def gaussj_method(pivot, matrix,solutionv):
     solutionv[pivot] = aux
 
     if row != pivot:
-        print("R",pivot+1,"<----> R",row+1)
+        sreg = sreg + ("R"+str(pivot+1)+"<----> R"+str(row+1)) +'\n'
 
 
-
-    print(matrix.printeq_sys(solutionv))
+    for i in range(0,matrix.rows):
+        for j in range(0,matrix.columns):
+            sreg = sreg + str(matrix[i][j]) + ' / '
+        sreg = sreg + ' || '+str(solutionv[i])+'\n'
+    #print(matrix.printeq_sys(solutionv))
+    sreg = sreg + '\n'
 
 
     if matrix[pivot][pivot] != 1:
@@ -291,47 +303,125 @@ def gaussj_method(pivot, matrix,solutionv):
             matrix[pivot][i] = matrix[pivot][i]/a
         solutionv[pivot] = solutionv[pivot]/a
 
-        print("(1/",a,")R",pivot+1,"-----> R",pivot)
+        sreg = sreg + ("(1/"+ str(a) + ")R"+str(pivot+1)+"-----> R"+str(pivot+1))+'\n'
 
-    print(matrix.printeq_sys(solutionv))
+    for i in range(0,matrix.rows):
+        for j in range(0,matrix.columns):
+            sreg = sreg + str(matrix[i][j]) + ' / '
+        sreg = sreg + ' || '+str(solutionv[i])+'\n'
+
+    #print(matrix.printeq_sys(solutionv))
 
     for i in range(pivot+1,matrix.rows):
         pt = -1*matrix[i][pivot]
-        print(pt,"R",pivot+1,"+ R",i+1,"------> R",i+1)
+        sreg = sreg + (str(pt)+"R"+str(pivot+1)+"+ R"+str(i+1)+"------> R"+str(i+1))+'\n'
         for j in range(pivot,matrix.columns):
             #print(pt)
             matrix[i][j] = matrix[i][j]+((pt)*matrix[pivot][j])
 
         solutionv[i] = solutionv[i]+((pt)*solutionv[pivot])
 
-    print(matrix.printeq_sys(solutionv))
+    for i in range(0,matrix.rows):
+        for j in range(0,matrix.columns):
+            sreg = sreg + str(matrix[i][j]) + ' / '
+        sreg = sreg + ' || '+str(solutionv[i])+'\n'
 
-
+    #print(matrix.printeq_sys(solutionv))
+    sreg = sreg +'\n\n'
+    return sreg
 
 def gauss_jordan(matrix,solutionv):
+    """
+    It takes a matrix and a solution vector and returns the solution vector
+
+    :param matrix: The matrix that you want to solve
+    :param solutionv: The solution vector
+    :return: the solution vector x.
+    """
+
+    s = ''
     for i in range(0,matrix.rows):
-        gaussj_method(i,matrix,solutionv)
+        s = s + '||Pivot ' + str(i+1)+'||\n\n'
+        s = s + gaussj_method(i,matrix,solutionv)
 
     x = []
 
+
+    s = s + "||Sustitución regresiva||\n\n"
     for r in range(matrix.rows-1,-1,-1):
         if matrix[r][r] == 1:
             if r == matrix.rows-1:
                 x.append(solutionv[r])
+                s = s + "x_" + str(r+1) + " = " + str(solutionv[r]) + '\n'
             else:
                 sum = 0
+                s = s + "x_" + str(r+1) + " = (" + str(solutionv[r]) + "-( "
                 for j in x:
                     for k in range(r+1,matrix.columns):
                         sum = sum+(j*matrix[r][k])
+                        s = s + "( " + str(matrix[r][k])+ "*"+ str(j) + ") "
+                        if k != matrix.columns-1:
+                                s = s + '+ '
 
+
+
+                s = s + ")"
                 sum = sum*-1
                 x.append((sum+solutionv[r])/matrix[r][r])
+                s = s + "/ " + str(matrix[r][r]) + '\n'
 
     x.reverse()
+    s = s + "||Las Soluciones del sistema son: ||\n\n"
     for i in range(0,matrix.rows):
-        print("x_",i," = ", x[i])
+        s = s + ("x_" + str(i+1)+" = "+  str(x[i])) + '\n'
 
+    return x,s
 
+def jacobian(ff,symb):
+    """
+    It takes a vector of functions and a vector of symbols and returns the Jacobian matrix of the functions with respect to
+    the symbols
+    :param ff: the function
+    :param symb: the symbols that are used in the function
+    :return: A matrix of the partial derivatives of the function with respect to the variables.
+    """
+    m = []
+
+    for i in range(0,len(ff)):
+        aux  = []
+        for j in range(0,len(symb)):
+            aux.append(diff(ff[i],symb[j]))
+        m.append(aux)
+
+    return Matrix(m)
+
+def hessian(ff,symb):
+    """
+    It takes a vector of functions and a vector of symbols and returns the Hessian matrix of the functions with respect to
+    the symbols
+    :param ff: a list of functions of the form f(x,y,z)
+    :param symb: the symbols that are used in the function
+    :return: A matrix of the second derivatives of the function.
+    """
+
+    m = []
+
+    for i in range(0,len(ff)):
+        aux  = []
+        for j in range(0,len(symb)):
+            aux.append(diff(ff[i],symb[j],2))
+        m.append(aux)
+    return Matrix(m)
+
+def eval_matrix(matrix , v):
+    e = 0
+    mm = []
+    for i in range(0,3):
+        aux = []
+        for j in range(0,3):
+            aux.append(matrix[i][j].subs([(x,v[0]),(y,v[1]),(z,[2])]).evalf())
+        mm.append(aux)
+    return Matrix(mm)
 
 
 
@@ -362,9 +452,10 @@ sg.Text('          '),
 sg.Button('Integración Numérica',size=(10,5),key='-NumIntegrationButton-')]
 ]
 
-
+#layout1 main menu for linear equations solving methods
 layout1 = [
-[sg.Text('METODOS PARA LA SOLUCION DE SISTEMAS DE ECUACIONES NO LINEALES')],
+[sg.Button('<--',size=(2,2),key='returnL0-L1'),
+sg.Text('METODOS PARA LA SOLUCION DE SISTEMAS DE ECUACIONES LINEALES')],
 
 [sg.Button('Métodos Directos',size=(10,5),key='-LinearDirectButton-'),
 sg.Text('          '),
@@ -376,15 +467,401 @@ sg.Button('Métodos de Factorización',size=(10,5),key='-LinearFactorButton-')],
 
 [sg.Button('Métodos Generales para Matrices',size=(10,5),key='-MatrixAppButton-')]
 ]
+#---------------------------------------------------------------------
+#Metods directos Menu
+layout2 = [
 
-layout2 = []
+[sg.Button('<--',size=(2,2),key='returnL1-L2'),
+sg.Text('METODOS DIRECTOS PARA LA SOLUCION DE SISTEMAS DE ECUACIONES LINEALES')],
+
+[sg.Button('Metodo de Gauss-Jordan',size=(10,5),key='-GaussMethod-'),
+sg.Text('          '),
+sg.Button('Método de Gauss-Jordan particionado ',size=(10,5),key='-GaussPartMethod-'),
+sg.Text('          '),
+sg.Button('Metodo de Matriz Inversa Particionado ',size=(10,5),key='-InversePartMethod-')
+]
+]
+
+layout2_1 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL2-L2_1'),sg.Text('Metodo de Gauss-Jordan')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B0-',size=(4,4))],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B1-',size=(4,4))],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B2-',size=(4,4))],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B3-',size=(4,4))],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B4-',size=(4,4))],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B5-',size=(4,4))],
 
 
+[sg.Button('SOLVE',key='-SolveGaussJM-',size=(5,5))],
+[sg.Text('Registro del proceso')],
+[sg.Multiline("",key='-LogGaussM-',size=(100,100),horizontal_scroll=True)],
 
+
+]
+
+layout2_2 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL2-L2_2'),sg.Text('Metodo de Gauss-Jordan Particionado')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B0-',size=(4,4))],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B1-',size=(4,4))],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B2-',size=(4,4))],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B3-',size=(4,4))],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B4-',size=(4,4))],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B5-',size=(4,4))],
+
+
+[sg.Button('SOLVE',key='-SolveGaussJPartM-',size=(5,5))],
+[sg.Text('Registro del proceso')],
+[sg.Multiline("",key='-LogGaussPartM-',size=(100,100),horizontal_scroll=True)],
+
+
+]
+
+layout2_3 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL2-L2_3'),sg.Text('Metodo de Matriz Inversa Particionado')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B0-',size=(4,4))],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B1-',size=(4,4))],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B2-',size=(4,4))],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B3-',size=(4,4))],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B4-',size=(4,4))],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B5-',size=(4,4))],
+
+
+[sg.Button('SOLVE',key='-SolveInversePartM-',size=(5,5))],
+[sg.Text('Registro del proceso')],
+[sg.Multiline("",key='-LogInversePartM-',size=(100,100),horizontal_scroll=True)],
+
+
+]
+
+#---------------------------------------------------------------------
+#Metodos Iterativos Menu
+layout3 = [
+
+[sg.Button('<--',size=(2,2),key='returnL1-L3'),
+sg.Text('METODOS ITERATIVOS PARA LA SOLUCION DE SISTEMAS DE ECUACIONES LINEALES')],
+
+[sg.Button('Metodo de Jacobi',size=(10,5),key='-JacobiMethod-'),
+sg.Text('          '),
+sg.Button('Metodo de Gauss-Seidel ',size=(10,5),key='-GaussSeidelMethod-'),
+sg.Text('          ')
+]
+]
+
+layout3_1 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL3-L3_1'),sg.Text('Metodo de Jacobi')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B0-',size=(4,4))],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B1-',size=(4,4))],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B2-',size=(4,4))],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B3-',size=(4,4))],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B4-',size=(4,4))],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B5-',size=(4,4))],
+
+
+[sg.Button('SOLVE',key='-SolveJacobiM-',size=(5,5))],
+[sg.Text('Registro del proceso')],
+[sg.Multiline("",key='-LogJacobiM-',size=(100,100),horizontal_scroll=True)],
+
+
+]
+
+layout3_2 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL3-L3_2'),sg.Text('Metodo de Gauss-Seidel')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B0-',size=(4,4))],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B1-',size=(4,4))],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B2-',size=(4,4))],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B3-',size=(4,4))],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B4-',size=(4,4))],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B5-',size=(4,4))],
+
+
+[sg.Button('SOLVE',key='-SolveGaussSeidelM-',size=(5,5))],
+[sg.Text('Registro del proceso')],
+[sg.Multiline("",key='-LogGaussSeidelM-',size=(100,100),horizontal_scroll=True)],
+
+
+]
+
+
+#---------------------------------------------------------------------
+#Metodos de factorizacion Menu
+layout4 = [
+[sg.Button('<--',size=(2,2),key='returnL1-L4'),
+sg.Text('METODOS DE FACTORIZACION PARA LA SOLUCION DE SISTEMAS DE ECUACIONES LINEALES')],
+
+[sg.Button('Método de Factorización de Doolittle',size=(10,5),key='-DoolittleMethod-'),
+sg.Text('          '),
+sg.Button('Método de Factorización de Crout',size=(10,5),key='-CroutMethod-'),
+sg.Text('          '),
+sg.Button('Método de Factorización de Cholesky',size=(10,5),key='-CholeskyMethod-')],
+
+
+]
+
+layout4_1 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL4-L4_1'),sg.Text('Método de Factorización de Doolittle')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B0-',size=(4,4))],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B1-',size=(4,4))],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B2-',size=(4,4))],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B3-',size=(4,4))],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B4-',size=(4,4))],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B5-',size=(4,4))],
+
+
+[sg.Button('SOLVE',key='-SolveDoolittleM-',size=(5,5))],
+[sg.Text('Registro del proceso')],
+[sg.Multiline("",key='-LogDoolittleM-',size=(100,100),horizontal_scroll=True)],
+
+
+]
+
+layout4_2 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL4-L4_2'),sg.Text('Método de Factorización de Crout')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B0-',size=(4,4))],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B1-',size=(4,4))],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B2-',size=(4,4))],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B3-',size=(4,4))],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B4-',size=(4,4))],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B5-',size=(4,4))],
+
+
+[sg.Button('SOLVE',key='-SolveCroutM-',size=(5,5))],
+[sg.Text('Registro del proceso')],
+[sg.Multiline("",key='-LogCroutM-',size=(100,100),horizontal_scroll=True)],
+
+
+]
+
+layout4_3 = [
+
+    [sg.Button('<--',size=(2,2),key='returnL4-L4_3'),sg.Text('Método de Factorización de Cholesky')],
+
+[sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
+sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B0-',size=(4,4))],
+
+[sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
+sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B1-',size=(4,4))],
+
+[sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
+sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B2-',size=(4,4))],
+
+[sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
+sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B3-',size=(4,4))],
+
+[sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
+sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B4-',size=(4,4))],
+
+[sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
+sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+sg.Text('|'),sg.Input('',key='-B5-',size=(4,4))],
+
+
+[sg.Button('SOLVE',key='-SolveCholeskyM-',size=(5,5))],
+[sg.Text('Registro del proceso')],
+[sg.Multiline("",key='-LogCholeskyM-',size=(100,100),horizontal_scroll=True)],
+
+
+]
+
+
+#---------------------------------------------------------------------
+layout5 = [
+[sg.Button('<--',size=(2,2),key='returnL1-L5'),
+sg.Text('METODOS PARA MATRICES')],
+
+[sg.Text('FILAS ') ,sg.Text('        ' ),sg.Text('COLUMNAS')],
+
+[sg.Combo([i for i in range(2,11)],key='-RowsSize-'),sg.Text('        ' ),
+    sg.Combo([i for i in range(2,11)],key='-ColsSize-')],
+
+[sg.Button('Operaciones Basicas Para Matrices',size=(10,5),key='-BasicMatrixMethods-'),
+sg.Text('          '),
+sg.Button('Matriz Inversa',size=(10,5),key='-InverseMethod-'),
+sg.Text('          '),
+sg.Button('Matriz Adjunta',size=(10,5),key='-AdjointMethod-')],
+
+[sg.Text('')],
+
+[sg.Button('Matriz Traspuesta',size=(10,5),key='-TransposeMethod-'),
+sg.Text('          '),
+sg.Button('Determinant',size=(10,5),key='-Determinant method-')]
+]
+
+
+layoutM1 = [
+    [sg.Input('-',key=str(i)+ str(j)+'M1' ,size=(4,4))for j in range(0,5)] for i in range(0,5)
+]
+
+layoutM2 = [
+    [sg.Input('-',key=str(i)+ str(j) +'M2',size=(4,4))for j in range(0,5)] for i in range(0,5)
+]
 #Main layout
 layout = [
     [sg.Column(layout=layout0,key='-COL{0}-',visible=True),
+
+
     sg.Column(layout=layout1,key='-COL{1}-',visible=False),
+
+
+    sg.Column(layout=layout2,key='-COL{2}-',visible=False),
+    sg.Column(layout=layout2_1,key='-COL{21}-',visible=False),
+    sg.Column(layout=layout2_2,key='-COL{22}-',visible=False),
+    sg.Column(layout=layout2_3,key='-COL{23}-',visible=False),
+
+
+
+
+    sg.Column(layout=layout3,key='-COL{3}-',visible=False),
+    sg.Column(layout=layout3_1,key='-COL{31}-',visible=False),
+    sg.Column(layout=layout3_2,key='-COL{32}-',visible=False),
+
+
+
+    sg.Column(layout=layout4,key='-COL{4}-',visible=False),
+    sg.Column(layout=layout4_1,key='-COL{41}-',visible=False),
+    sg.Column(layout=layout4_2,key='-COL{42}-',visible=False),
+    sg.Column(layout=layout4_3,key='-COL{43}-',visible=False),
+
+
+
+    sg.Column(layout=layout5,key='-COL{5}-',visible=False),
     ]
 ]
 
@@ -392,10 +869,10 @@ layout = [
 
 
 #m = [[1,2,3,4],[2,3,4,6],[2,6,5,6],[2,325,6,3]]
-#m2 = [[3,81,1],[100,8,74],[300,14,102]]
-#b = [1,2,3,4]
+m2 = [[5,2,0],[2,1,-1],[2,3,-2]]
+b = [1,2,3]
 #mt = Matrix(m)
-#mt2 = Matrix(m2)
+mt2 = Matrix(m2)
 #mt2inv = mt2.inverse()
 
 #print(mt2)
@@ -412,56 +889,6 @@ print(ff)
 
 
 
-def jacobian(ff,symb):
-    """
-    It takes a vector of functions and a vector of symbols and returns the Jacobian matrix of the functions with respect to
-    the symbols
-
-    :param ff: the function
-    :param symb: the symbols that are used in the function
-    :return: A matrix of the partial derivatives of the function with respect to the variables.
-    """
-    m = []
-
-    for i in range(0,len(ff)):
-        aux  = []
-        for j in range(0,len(symb)):
-            aux.append(diff(ff[i],symb[j]))
-        m.append(aux)
-
-    return Matrix(m)
-
-
-def hessian(ff,symb):
-    """
-    It takes a vector of functions and a vector of symbols and returns the Hessian matrix of the functions with respect to
-    the symbols
-
-    :param ff: a list of functions of the form f(x,y,z)
-    :param symb: the symbols that are used in the function
-    :return: A matrix of the second derivatives of the function.
-    """
-
-    m = []
-
-    for i in range(0,len(ff)):
-        aux  = []
-        for j in range(0,len(symb)):
-            aux.append(diff(ff[i],symb[j],2))
-        m.append(aux)
-    return Matrix(m)
-
-
-def eval_matrix(matrix , v):
-    e = 0
-    mm = []
-    for i in range(0,3):
-        aux = []
-        for j in range(0,3):
-            aux.append(matrix[i][j].subs([(x,v[0]),(y,v[1]),(z,[2])]).evalf())
-        mm.append(aux)
-    return Matrix(mm)
-
 
 
 
@@ -473,7 +900,7 @@ print(j.inverse())
 
 
 # Create the Window
-window = sg.Window('Métodos Numéricos ', layout,size=(720,480))
+window = sg.Window('Métodos Numéricos ', layout,size=(720,480),resizable=True)
 #Event Loop to process "events" and get the "values" of the inputs
 while True:
     event, values = window.read()
@@ -484,7 +911,159 @@ while True:
     if event == '-LinearEqButton-':
         window['-COL{0}-'].update(visible=False)
         window['-COL{1}-'].update(visible=True)
+#----------------------------------------------------------------
+    if event == '-LinearDirectButton-':
+        window['-COL{1}-'].update(visible=False)
+        window['-COL{2}-'].update(visible=True)
+#....................
+    if event == '-GaussMethod-':
+        window['-COL{2}-'].update(visible=False)
+        window['-COL{21}-'].update(visible=True)
+
+    if event == '-SolveGaussJM-':
+
+        mm = []
+        bb = []
+
+        for i in range(0,6):
+            aux = []
+            for j in range(0,6):
+                if values['-M'+str(i)+str(j)+'-'] != '':
+                    try:
+                        aux.append(float(values['-M'+str(i)+str(j)+'-']))
+                    except:
+                        continue
+                else:
+                    continue
+            if len(aux) != 0:
+                mm.append(aux)
+        for k in range(0,6):
+            if values['-B'+str(k)+'-'] != '':
+                try:
+                    bb.append(float(values['-B'+str(k)+'-']))
+                except:
+                    continue
+
+        mat = Matrix(mm)
+        print(mat.printeq_sys(bb))
+
+        try:
+            mm[0]
+            len(mm)
+            flag = True
+        except:
+            flag = False
+
+
+        if flag and (len(mm) == len(mm[0])) and (len(bb) == len(mm)):
+
+            if mat.determinat() != 0:
+                g = gauss_jordan(mat,bb)
+                window.Element('-LogGaussM-').update(value=g[1])
+
+                for i in range(0,mat.rows):
+                    for j in range(0,mat.columns):
+                        if i == j:
+                            window.Element('-M'+str(i)+str(j)+'-').update(value='1')
+                        else:
+                            window.Element('-M'+str(i)+str(j)+'-').update(value='0')
+                    window.Element('-B'+str(i)+'-').update(value=str(g[0][i]))
+
+
+
+            else:
+                sg.popup_ok("El sistema No tiene soluciones")
+        else:
+            sg.popup_ok("La matriz no es cuadrado")
+
+#....................
+    if event == '-GaussPartMethod-':
+        window['-COL{2}-'].update(visible=False)
+        window['-COL{22}-'].update(visible=True)
+
+#....................
+
+    if event == '-InversePartMethod-':
+        window['-COL{2}-'].update(visible=False)
+        window['-COL{23}-'].update(visible=True)
+
+
+
+
+
+#----------------------------------------------------------------
+
+
+    if event == '-LinearIterativeButton-':
+        window['-COL{1}-'].update(visible=False)
+        window['-COL{3}-'].update(visible=True)
+
+    if event == '-LinearFactorButton-':
+        window['-COL{1}-'].update(visible=False)
+        window['-COL{4}-'].update(visible=True)
+
+
+    if event == '-MatrixAppButton-':
+        window['-COL{1}-'].update(visible=False)
+        window['-COL{5}-'].update(visible=True)
+
+
+
+
+
+
+
+    if event == 'returnL0-L1':
+        window['-COL{0}-'].update(visible=True)
+        window['-COL{1}-'].update(visible=False)
+#----------------------------------------------------------------
+    if event == 'returnL1-L2':
+        window['-COL{1}-'].update(visible=True)
+        window['-COL{2}-'].update(visible=False)
+
+    if event == 'returnL2-L2_1':
+        window['-COL{2}-'].update(visible=True)
+        window['-COL{21}-'].update(visible=False)
+        for i in range(0,6):
+            for j in range(0,6):
+                window.Element('-M'+str(i)+str(j)+'-').update(value='')
+            window.Element('-B'+str(i)+'-').update(value='')
+
+    if event == 'returnL2-L2_2':
+        window['-COL{2}-'].update(visible=True)
+        window['-COL{22}-'].update(visible=False)
+        for i in range(0,6):
+            for j in range(0,6):
+                window.Element('-M'+str(i)+str(j)+'-').update(value='')
+            window.Element('-B'+str(i)+'-').update(value='')
+
+    if event == 'returnL2-L2_3':
+        window['-COL{2}-'].update(visible=True)
+        window['-COL{23}-'].update(visible=False)
+        for i in range(0,6):
+            for j in range(0,6):
+                window.Element('-M'+str(i)+str(j)+'-').update(value='')
+            window.Element('-B'+str(i)+'-').update(value='')
+
+
+
+#----------------------------------------------------------------
+    if event == 'returnL1-L3':
+        window['-COL{1}-'].update(visible=True)
+        window['-COL{3}-'].update(visible=False)
+
+
+    if event == 'returnL1-L4':
+        window['-COL{1}-'].update(visible=True)
+        window['-COL{4}-'].update(visible=False)
+
+    if event == 'returnL1-L5':
+        window['-COL{1}-'].update(visible=True)
+        window['-COL{5}-'].update(visible=False)
+
+
 
     print('You entered ', event)
+    #print(values,"Valuessss")
 
 window.close()

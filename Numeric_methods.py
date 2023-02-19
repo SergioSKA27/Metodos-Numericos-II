@@ -998,11 +998,35 @@ while True:
         window['-COL{1}-'].update(visible=False)
         window['-COL{3}-'].update(visible=True)
 
+
+    if event == '-JacobiMethod-':
+        window['-COL{3}-'].update(visible=False)
+        window['-COL{31}-'].update(visible=True)
+
+
+    if event == '-GaussSeidelMethod-':
+        window['-COL{3}-'].update(visible=False)
+        window['-COL{32}-'].update(visible=True)
+
+
+#----------------------------------------------------------------
     if event == '-LinearFactorButton-':
         window['-COL{1}-'].update(visible=False)
         window['-COL{4}-'].update(visible=True)
 
+    if event == '-DoolittleMethod-':
+        window['-COL{4}-'].update(visible=False)
+        window['-COL{41}-'].update(visible=True)
 
+    if event == '-CroutMethod-':
+        window['-COL{4}-'].update(visible=False)
+        window['-COL{42}-'].update(visible=True)
+
+    if event == '-CholeskyMethod-':
+        window['-COL{4}-'].update(visible=False)
+        window['-COL{43}-'].update(visible=True)
+
+#----------------------------------------------------------------
     if event == '-MatrixAppButton-':
         window['-COL{1}-'].update(visible=False)
         window['-COL{5}-'].update(visible=True)
@@ -1052,11 +1076,54 @@ while True:
         window['-COL{1}-'].update(visible=True)
         window['-COL{3}-'].update(visible=False)
 
+    if event == 'returnL3-L3_1':
+        window['-COL{3}-'].update(visible=True)
+        window['-COL{31}-'].update(visible=False)
+        for i in range(0,6):
+            for j in range(0,6):
+                window.Element('-M'+str(i)+str(j)+'-').update(value='')
+            window.Element('-B'+str(i)+'-').update(value='')
+
+    if event == 'returnL3-L3_2':
+        window['-COL{3}-'].update(visible=True)
+        window['-COL{32}-'].update(visible=False)
+        for i in range(0,6):
+            for j in range(0,6):
+                window.Element('-M'+str(i)+str(j)+'-').update(value='')
+            window.Element('-B'+str(i)+'-').update(value='')
+
+
+#----------------------------------------------------------------
+
 
     if event == 'returnL1-L4':
         window['-COL{1}-'].update(visible=True)
         window['-COL{4}-'].update(visible=False)
 
+    if event == 'returnL4-L4_1':
+        window['-COL{4}-'].update(visible=True)
+        window['-COL{41}-'].update(visible=False)
+        for i in range(0,6):
+            for j in range(0,6):
+                window.Element('-M'+str(i)+str(j)+'-').update(value='')
+            window.Element('-B'+str(i)+'-').update(value='')
+
+    if event == 'returnL4-L4_2':
+        window['-COL{4}-'].update(visible=True)
+        window['-COL{42}-'].update(visible=False)
+        for i in range(0,6):
+            for j in range(0,6):
+                window.Element('-M'+str(i)+str(j)+'-').update(value='')
+            window.Element('-B'+str(i)+'-').update(value='')
+
+    if event == 'returnL4-L4_3':
+        window['-COL{4}-'].update(visible=True)
+        window['-COL{43}-'].update(visible=False)
+        for i in range(0,6):
+            for j in range(0,6):
+                window.Element('-M'+str(i)+str(j)+'-').update(value='')
+            window.Element('-B'+str(i)+'-').update(value='')
+#----------------------------------------------------------------
     if event == 'returnL1-L5':
         window['-COL{1}-'].update(visible=True)
         window['-COL{5}-'].update(visible=False)

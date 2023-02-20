@@ -1,7 +1,12 @@
 #!/usr/bin/python
 import PySimpleGUI as sg
+import numpy as np
+import math
 import sys
 from sympy import *
+from matplotlib import pyplot as plt
+from sympy.plotting.plot import MatplotlibBackend, Plot
+
 
 
 
@@ -39,8 +44,9 @@ class Matrix:
         """
         mat = ''
         for i in range(0,self.rows):
-            for j in range(0,self.columns):
+            for j in range(0,len(self.matrix[i])):
                 mat = mat + str(self.matrix[i][j])+'\t '
+
             mat = mat + "\n"
         return mat
 
@@ -51,7 +57,7 @@ class Matrix:
         :param other: The other matrix to add to this one
         :return: A new matrix with the sum of the two matrices
         """
-        if self.rows != other.rows and  self.columns != other.columns:
+        if self.rows != other.rows and  self.columns != other.columns and self.checksum() == other.checksum() and self.checksum() % 2 == 0:
             raise Exception("Matrices doesn't have the same size :(")
 
         m = []
@@ -70,7 +76,7 @@ class Matrix:
         :param other: The other matrix to be subtracted from the current matrix
         :return: A new matrix with the subtraction of the two matrices.
         """
-        if self.rows != other.rows and  self.columns != other.columns:
+        if self.rows != other.rows and  self.columns != other.columns and self.checksum() == other.checksum() and self.checksum() % 2 == 0:
             raise Exception("Matrices doesn't have the same size :(")
 
         m = []
@@ -90,7 +96,7 @@ class Matrix:
         :param other: The other matrix to multiply with
         :return: A matrix
         """
-        if self.columns != other.rows:
+        if self.columns != other.rows and self.checksum() % 2 != 0 and other.checksum() % 2 != 0:
             raise Exception("Matrices cannot be multiplied :(")
         m = []
 
@@ -123,11 +129,21 @@ class Matrix:
         """
         mat = ''
         for i in range(0,self.rows):
-            for j in range(0,self.columns):
+            for j in range(0,len(self.matrix[i])):
                 mat = mat + str(self.matrix[i][j])+' '
             mat = mat + "|"+str(v[i])
             mat = mat + "\n"
         return mat
+
+    def checksum(self):
+        """
+        It returns the sum of the lengths of the rows of the matrix
+        :return: The length of the matrix plus the length of each row in the matrix.
+        """
+        s = len(self.matrix)
+        for i in self.matrix:
+            s = s + len(i)
+        return s
 
     def transpose(self):
         """
@@ -257,6 +273,7 @@ class Matrix:
         b = self.matrix[to_row]
         self.matrix[from_row] = b
         self.matrix[to_row] = a
+
 
 
 
@@ -422,6 +439,85 @@ def eval_matrix(matrix , v):
             aux.append(matrix[i][j].subs([(x,v[0]),(y,v[1]),(z,[2])]).evalf())
         mm.append(aux)
     return Matrix(mm)
+
+
+def get_sympy_subplots(plot:Plot):
+    """
+    It takes a plot object and returns a matplotlib figure object
+
+    :param plot: The plot object to be rendered
+    :type plot: Plot
+    :return: A matplotlib figure object.
+    """
+    backend = MatplotlibBackend(plot)
+
+    backend.process_series()
+    backend.fig.tight_layout()
+    return backend.plt
+
+def li(v, i):
+    """
+    The function takes a list of numbers and an index, and returns the Lagrange interpolating polynomial for the list of
+    numbers with the index'th number removed
+
+    :param v: the list of x values
+    :param i: the index of the x value you want to interpolate
+    :return: the Lagrange interpolating polynomial for the given data points.
+    """
+    x = symbols('x')
+
+    s = 1
+    st = ''
+    for k in range(0,len(v)):
+        if k != i:
+            st = st + '((' + str(x) + '-'+ str(v[k])+')/('+str(v[i])+'-'+str(v[k])+'))'
+            s = s*((x-v[k])/(v[i]-v[k]))
+
+    return s
+
+def Lagrange(v,fx):
+    """
+    It takes in a list of x values and a list of y values, and returns the Lagrange polynomial that interpolates those
+    points
+
+    :param v: list of x values
+    :param fx: The function you want to interpolate
+    :return: the Lagrange polynomial.
+    """
+    print(v)
+    print(fx)
+    lis = []
+    for i in range(0,len(v)):
+        lis.append(li(v,i))
+
+    sums = 0
+
+    for k in range(0,len(v)):
+        sums = sums+(fx[k]*lis[k])
+
+    print(sums)
+
+    simplify(sums)
+
+    pprint(sums)
+
+    p1 = plot(sums,(sums,0,math.pi),(math.pi/2,0),show=False)
+    p2 = get_sympy_subplots(p1)
+    p2.plot(v,fx,"o")
+    p2.show()
+    return sums
+
+
+
+
+
+
+
+vv = [0,math.pi/2,math.pi]
+fxi = [0,1,0]
+
+
+Lagrange(vv,fxi)
 
 
 
@@ -824,48 +920,48 @@ layout5_1 = [
     [sg.Button('<--',size=(2,2),key='returnL5-L5_1'),sg.Text('Operaciones Con Matrices')],
 
 [
-sg.Input('',key='-M00-',size=(4,4)), sg.Input('',key='-M01-',size=(4,4)),sg.Input('',key='-M02-',size=(4,4)),
-sg.Input('',key='-M03-',size=(4,4)),sg.Input('',key='-M04-',size=(4,4)),sg.Input('',key='-M05-',size=(4,4)),
+sg.Input('',key='L51-M00-',size=(4,4)), sg.Input('',key='L51-M01-',size=(4,4)),sg.Input('',key='L51-M02-',size=(4,4)),
+sg.Input('',key='L51-M03-',size=(4,4)),sg.Input('',key='L51-M04-',size=(4,4)),sg.Input('',key='L51-M05-',size=(4,4)),
 sg.Text('   '),
 sg.Input('',key='-M200-',size=(4,4)), sg.Input('',key='-M201-',size=(4,4)),sg.Input('',key='-M202-',size=(4,4)),
 sg.Input('',key='-M203-',size=(4,4)),sg.Input('',key='-M204-',size=(4,4)),sg.Input('',key='-M205-',size=(4,4)),
 ],
 
 [
-sg.Input('',key='-M10-',size=(4,4)), sg.Input('',key='-M11-',size=(4,4)),sg.Input('',key='-M12-',size=(4,4)),
-sg.Input('',key='-M13-',size=(4,4)),sg.Input('',key='-M14-',size=(4,4)),sg.Input('',key='-M15-',size=(4,4)),
+sg.Input('',key='L51-M10-',size=(4,4)), sg.Input('',key='L51-M11-',size=(4,4)),sg.Input('',key='L51-M12-',size=(4,4)),
+sg.Input('',key='L51-M13-',size=(4,4)),sg.Input('',key='L51-M14-',size=(4,4)),sg.Input('',key='L51-M15-',size=(4,4)),
 sg.Text('   '),
 sg.Input('',key='-M210-',size=(4,4)), sg.Input('',key='-M211-',size=(4,4)),sg.Input('',key='-M212-',size=(4,4)),
 sg.Input('',key='-M213-',size=(4,4)),sg.Input('',key='-M214-',size=(4,4)),sg.Input('',key='-M215-',size=(4,4)),
 ],
 
 [
-sg.Input('',key='-M20-',size=(4,4)), sg.Input('',key='-M21-',size=(4,4)),sg.Input('',key='-M22-',size=(4,4)),
-sg.Input('',key='-M23-',size=(4,4)),sg.Input('',key='-M24-',size=(4,4)),sg.Input('',key='-M25-',size=(4,4)),
+sg.Input('',key='L51-M20-',size=(4,4)), sg.Input('',key='L51-M21-',size=(4,4)),sg.Input('',key='L51-M22-',size=(4,4)),
+sg.Input('',key='L51-M23-',size=(4,4)),sg.Input('',key='L51-M24-',size=(4,4)),sg.Input('',key='L51-M25-',size=(4,4)),
 sg.Text(' + ',key='-opmatrix-'),
 sg.Input('',key='-M220-',size=(4,4)), sg.Input('',key='-M221-',size=(4,4)),sg.Input('',key='-M222-',size=(4,4)),
 sg.Input('',key='-M223-',size=(4,4)),sg.Input('',key='-M224-',size=(4,4)),sg.Input('',key='-M225-',size=(4,4)),
 ],
 
 [
-sg.Input('',key='-M30-',size=(4,4)), sg.Input('',key='-M31-',size=(4,4)),sg.Input('',key='-M32-',size=(4,4)),
-sg.Input('',key='-M33-',size=(4,4)),sg.Input('',key='-M34-',size=(4,4)),sg.Input('',key='-M35-',size=(4,4)),
+sg.Input('',key='L51-M30-',size=(4,4)), sg.Input('',key='L51-M31-',size=(4,4)),sg.Input('',key='L51-M32-',size=(4,4)),
+sg.Input('',key='L51-M33-',size=(4,4)),sg.Input('',key='L51-M34-',size=(4,4)),sg.Input('',key='L51-M35-',size=(4,4)),
 sg.Text('   '),
 sg.Input('',key='-M230-',size=(4,4)), sg.Input('',key='-M231-',size=(4,4)),sg.Input('',key='-M232-',size=(4,4)),
-sg.Input('',key='size=(5,5)M233-',size=(4,4)),sg.Input('',key='-M234-',size=(4,4)),sg.Input('',key='-M235-',size=(4,4)),
+sg.Input('',key='-M233-',size=(4,4)),sg.Input('',key='-M234-',size=(4,4)),sg.Input('',key='-M235-',size=(4,4)),
 ],
 
 [
-sg.Input('',key='-M40-',size=(4,4)), sg.Input('',key='-M41-',size=(4,4)),sg.Input('',key='-M42-',size=(4,4)),
-sg.Input('',key='-M43-',size=(4,4)),sg.Input('',key='-M44-',size=(4,4)),sg.Input('',key='-M45-',size=(4,4)),
+sg.Input('',key='L51-M40-',size=(4,4)), sg.Input('',key='L51-M41-',size=(4,4)),sg.Input('',key='L51-M42-',size=(4,4)),
+sg.Input('',key='L51-M43-',size=(4,4)),sg.Input('',key='L51-M44-',size=(4,4)),sg.Input('',key='L51-M45-',size=(4,4)),
 sg.Text('   '),
 sg.Input('',key='-M240-',size=(4,4)), sg.Input('',key='-M241-',size=(4,4)),sg.Input('',key='-M242-',size=(4,4)),
 sg.Input('',key='-M243-',size=(4,4)),sg.Input('',key='-M244-',size=(4,4)),sg.Input('',key='-M245-',size=(4,4)),
 ],
 
 [
-sg.Input('',key='-M50-',size=(4,4)), sg.Input('',key='-M51-',size=(4,4)),sg.Input('',key='-M52-',size=(4,4)),
-sg.Input('',key='-M53-',size=(4,4)),sg.Input('',key='-M54-',size=(4,4)),sg.Input('',key='-M55-',size=(4,4)),
+sg.Input('',key='L51-M50-',size=(4,4)), sg.Input('',key='L51-M51-',size=(4,4)),sg.Input('',key='L51-M52-',size=(4,4)),
+sg.Input('',key='L51-M53-',size=(4,4)),sg.Input('',key='L51-M54-',size=(4,4)),sg.Input('',key='L51-M55-',size=(4,4)),
 sg.Text('   '),
 sg.Input('',key='-M250-',size=(4,4)), sg.Input('',key='-M251-',size=(4,4)),sg.Input('',key='-M252-',size=(4,4)),
 sg.Input('',key='-M253-',size=(4,4)),sg.Input('',key='-M254-',size=(4,4)),sg.Input('',key='-M255-',size=(4,4)),
@@ -877,33 +973,33 @@ sg.Button('*',size=(3,3),key='-matmul-'),sg.Button('Calcular',size=(7,3),key='-C
 [sg.Text('RESULTADO')],
 
 [
-sg.Input('',key='-MR00-',size=(4,4)), sg.Input('',key='-MR01-',size=(4,4)),sg.Input('',key='-MR02-',size=(4,4)),
-sg.Input('',key='-MR03-',size=(4,4)),sg.Input('',key='-MR04-',size=(4,4)),sg.Input('',key='-MR05-',size=(4,4)),
+sg.Input('',key='L51-MR00-',size=(4,4)), sg.Input('',key='L51-MR01-',size=(4,4)),sg.Input('',key='L51-MR02-',size=(4,4)),
+sg.Input('',key='L51-MR03-',size=(4,4)),sg.Input('',key='L51-MR04-',size=(4,4)),sg.Input('',key='L51-MR05-',size=(4,4)),
 ],
 
 [
-sg.Input('',key='-MR10-',size=(4,4)), sg.Input('',key='-MR11-',size=(4,4)),sg.Input('',key='-MR12-',size=(4,4)),
-sg.Input('',key='-MR13-',size=(4,4)),sg.Input('',key='-MR14-',size=(4,4)),sg.Input('',key='-MR15-',size=(4,4)),
+sg.Input('',key='L51-MR10-',size=(4,4)), sg.Input('',key='L51-MR11-',size=(4,4)),sg.Input('',key='L51-MR12-',size=(4,4)),
+sg.Input('',key='L51-MR13-',size=(4,4)),sg.Input('',key='L51-MR14-',size=(4,4)),sg.Input('',key='L51-MR15-',size=(4,4)),
 ],
 
 [
-sg.Input('',key='-MR20-',size=(4,4)), sg.Input('',key='-MR21-',size=(4,4)),sg.Input('',key='-MR22-',size=(4,4)),
-sg.Input('',key='-MR23-',size=(4,4)),sg.Input('',key='-MR24-',size=(4,4)),sg.Input('',key='-MR25-',size=(4,4)),
+sg.Input('',key='L51-MR20-',size=(4,4)), sg.Input('',key='L51-MR21-',size=(4,4)),sg.Input('',key='L51-MR22-',size=(4,4)),
+sg.Input('',key='L51-MR23-',size=(4,4)),sg.Input('',key='L51-MR24-',size=(4,4)),sg.Input('',key='L51-MR25-',size=(4,4)),
 ],
 
 [
-sg.Input('',key='-MR30-',size=(4,4)), sg.Input('',key='-MR31-',size=(4,4)),sg.Input('',key='-MR32-',size=(4,4)),
-sg.Input('',key='-MR33-',size=(4,4)),sg.Input('',key='-MR34-',size=(4,4)),sg.Input('',key='-MR35-',size=(4,4)),
+sg.Input('',key='L51-MR30-',size=(4,4)), sg.Input('',key='L51-MR31-',size=(4,4)),sg.Input('',key='L51-MR32-',size=(4,4)),
+sg.Input('',key='L51-MR33-',size=(4,4)),sg.Input('',key='L51-MR34-',size=(4,4)),sg.Input('',key='L51-MR35-',size=(4,4)),
 ],
 
 [
-sg.Input('',key='-MR40-',size=(4,4)), sg.Input('',key='-MR41-',size=(4,4)),sg.Input('',key='-MR42-',size=(4,4)),
-sg.Input('',key='-MR43-',size=(4,4)),sg.Input('',key='-MR44-',size=(4,4)),sg.Input('',key='-MR45-',size=(4,4)),
+sg.Input('',key='L51-MR40-',size=(4,4)), sg.Input('',key='L51-MR41-',size=(4,4)),sg.Input('',key='L51-MR42-',size=(4,4)),
+sg.Input('',key='L51-MR43-',size=(4,4)),sg.Input('',key='L51-MR44-',size=(4,4)),sg.Input('',key='L51-MR45-',size=(4,4)),
 ],
 
 [
-sg.Input('',key='-MR50-',size=(4,4)), sg.Input('',key='-MR51-',size=(4,4)),sg.Input('',key='-MR52-',size=(4,4)),
-sg.Input('',key='-MR53-',size=(4,4)),sg.Input('',key='-MR54-',size=(4,4)),sg.Input('',key='-MR55-',size=(4,4)),
+sg.Input('',key='L51-MR50-',size=(4,4)), sg.Input('',key='-MR51-',size=(4,4)),sg.Input('',key='-MR52-',size=(4,4)),
+sg.Input('',key='L51-MR53-',size=(4,4)),sg.Input('',key='-MR54-',size=(4,4)),sg.Input('',key='-MR55-',size=(4,4)),
 ],
 
 
@@ -1198,6 +1294,8 @@ print(j.inverse())
 
 # Create the Window
 window = sg.Window('Métodos Numéricos ', layout,size=(720,480),resizable=True)
+
+matop = '+'
 #Event Loop to process "events" and get the "values" of the inputs
 while True:
     event, values = window.read()
@@ -1331,6 +1429,80 @@ while True:
     if event == '-BasicMatrixMethods-':
         window['-COL{5}-'].update(visible=False)
         window['-COL{51}-'].update(visible=True)
+
+    if event == '-matsum-':
+        window.Element('-opmatrix-').update(value='+')
+        matop = '+'
+
+    if event == '-matdif-':
+        window.Element('-opmatrix-').update(value='-')
+        matop = '-'
+
+    if event == '-matmul-':
+        window.Element('-opmatrix-').update(value='*')
+        matop = '*'
+
+
+    if event == '-CalcMatOp-':
+        mm = []
+        gg = []
+
+        try:
+
+            for i in range(0,6):
+                aux = []
+                aux2 = []
+                for j in range(0,6):
+                    if values['L51-M'+str(i)+str(j)+'-'] != '' and values['-M2'+str(i)+str(j)+'-'] != '':
+                        try:
+                            aux.append(float(values['L51-M'+str(i)+str(j)+'-']))
+                            aux2.append(float(values['-M2'+str(i)+str(j)+'-']))
+                        except:
+                            continue
+                    else:
+                        continue
+                if len(aux) != 0 and len(aux2) != 0:
+                    mm.append(aux)
+                    gg.append(aux2)
+            m1 = Matrix(mm)
+            m2 = Matrix(gg)
+        except:
+            sg.popup_ok("Algo Salio Mal intente otra vez :(")
+
+
+        print(m1)
+        print(m2)
+
+        if matop == '+':
+            try:
+                r = m1+m2
+                for i in range(0,r.rows):
+                    for j in range(0,r.columns):
+                        window.Element('L51-MR'+str(i)+str(j)+'-').update(value=str(r[i][j]))
+            except Exception as exep:
+                sg.popup_ok("Algo salio Mal intente otra vez :("+str(exep))
+
+        if matop == '-':
+            try:
+                r = m1-m2
+                for i in range(0,r.rows):
+                    for j in range(0,r.columns):
+                        window.Element('L51-MR'+str(i)+str(j)+'-').update(value=str(r[i][j]))
+            except Exception as exep:
+                sg.popup_ok("Algo salio Mal intente otra vez :("+str(exep))
+
+        if matop == '*':
+            try:
+                r = m1*m2
+                for i in range(0,r.rows):
+                    for j in range(0,r.columns):
+                        window.Element('L51-MR'+str(i)+str(j)+'-').update(value=str(r[i][j]))
+            except Exception as exep:
+                sg.popup_ok("Algo salio Mal intente otra vez :(\n"+str(exep))
+
+
+
+
 
     if event == '-InverseMethod-':
         window['-COL{5}-'].update(visible=False)

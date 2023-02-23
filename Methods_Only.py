@@ -296,6 +296,176 @@ def Newton_interpolation(fx,v):
 
     return expr
 
+def spline_natural(fx,v):
+    """
+    It takes a list of x values and a list of y values, and returns a list of sympy expressions that represent the cubic
+    spline interpolation of the data
+
+    :param fx: list of f(x) values
+    :param v: list of x values
+    """
+
+    inter = []
+    fxinter = []
+
+    hi =[]
+    for i in range(0,len(v)-1):
+        inter.append((v[i],v[i+1]))
+        fxinter.append((fx[i],fx[i+1]))
+
+    print(inter)
+    for i in range(0,len(inter)):
+        hi.append(inter[i][1]-inter[i][0])
+
+    m = np.zeros(len(v)**2).reshape(len(fx),len(fx))
+    print(hi)
+    print(m)
+    for i in range(0,len(v)):
+        for j in range(0,len(v)):
+            if (i == j and i == 0 and j == 0) or (j == i and i == len(v)-1 and j == len(v)-1):
+                m[i][j] = 1
+                continue
+            else:
+                if (i == j):
+                    m[i][j] = 2*(hi[i-1]+hi[i])
+                    m[i][j-1] = hi[i-1]
+                    m[i][j+1] = hi[i]
+
+    b = np.zeros(len(v))
+
+    for i in range(1,len(v)-1):
+        b[i] = ((1/hi[i])*(fx[i+1]-fx[i]))-((1/hi[i-1])*(fx[i]-fx[i-1]))
+
+    print(m)
+    pprint(Matrix(b.transpose()))
+
+    c = (Matrix(m).inv())*Matrix(b.transpose())
+    pprint(c)
+    b = []
+
+    for i in range(0,len(hi)):
+        b.append(((fx[i+1]-fx[i])/hi[i])-((((2*c[i])+c[i+1])*hi[i])/3))
+
+    pprint(Matrix(b))
+
+    d = []
+
+    for i in range(0,len(hi)):
+        d.append((c[i+1]-c[i])/(3*hi[i]))
+
+    pprint(Matrix(d))
+
+
+    x = symbols('x')
+    spl = []
+    for i in range(0,len(inter)):
+        spl.append(fx[i]+ (b[i]*(x-v[i]))+(c[i]*((x-v[i])**2)) + (d[i]*((x-v[i])**3)))
+
+    pprint(Matrix(spl))
+
+
+
+    p = plot(spl[0], (x,inter[0][0],inter[0][1]),show=False)
+
+    for i in range(1, len(spl)):
+        paux = plot(spl[i],(x,inter[i][0],inter[i][1]),show=False)
+        p.append(paux[0])
+
+
+    p2 = get_sympy_subplots(p)
+    p2.plot(v,fx,"o")
+    p2.show()
+
+def spline_sujeto(fx,v,fpx0,fpx1 ):
+    """
+    It takes a list of x values, a list of y values, and the first and second derivatives of the first and last points, and
+    returns a plot of the cubic spline interpolation
+
+    :param fx: the function values
+    :param v: the x values of the points
+    :param fpx0: the first derivative of the function at the first point
+    :param fpx1: the derivative of the function at the last point
+    """
+
+    inter = []
+    fxinter = []
+
+    hi =[]
+    for i in range(0,len(v)-1):
+        inter.append((v[i],v[i+1]))
+        fxinter.append((fx[i],fx[i+1]))
+
+    print(inter)
+    for i in range(0,len(inter)):
+        hi.append(inter[i][1]-inter[i][0])
+
+    m = np.zeros(len(v)**2).reshape(len(fx),len(fx))
+    print(hi)
+    print(m)
+    for i in range(0,len(v)):
+        for j in range(0,len(v)):
+            if (i == j and i == 0 and j == 0) :
+                m[i][j] = 2*hi[i]
+                m[i][j+1] = hi[i]
+                continue
+            elif (j == i and i == len(v)-1 and j == len(v)-1):
+                m[i][j] = 2*hi[-1]
+                m[i][j-1] = hi[-1]
+                continue
+            else:
+                if (i == j):
+                    m[i][j] = 2*(hi[i-1]+hi[i])
+                    m[i][j-1] = hi[i-1]
+                    m[i][j+1] = hi[i]
+
+    b = np.zeros(len(v))
+    b[0] = ((3/hi[0])*(fx[1]-fx[0]))- (3*fpx0)
+    b[-1] = (3*fpx1)-((3/hi[-1])*(fx[-1]-fx[len(fx)-2]))
+
+    for i in range(1,len(v)-1):
+        b[i] = ((3/hi[i])*(fx[i+1]-fx[i]))-((3/hi[i-1])*(fx[i]-fx[i-1]))
+
+    print(m)
+    pprint(Matrix(b.transpose()))
+
+    c = (Matrix(m).inv())*Matrix(b.transpose())
+    pprint(c)
+    b = []
+
+    for i in range(0,len(hi)):
+        b.append(((fx[i+1]-fx[i])/hi[i])-((((2*c[i])+c[i+1])*hi[i])/3))
+
+    pprint(Matrix(b))
+
+    d = []
+
+    for i in range(0,len(hi)):
+        d.append((c[i+1]-c[i])/(3*hi[i]))
+
+    pprint(Matrix(d))
+
+
+    x = symbols('x')
+    spl = []
+    for i in range(0,len(inter)):
+        spl.append(fx[i]+ (b[i]*(x-v[i]))+(c[i]*((x-v[i])**2)) + (d[i]*((x-v[i])**3)))
+
+    pprint(Matrix(spl))
+
+
+
+    p = plot(spl[0], (x,inter[0][0],inter[0][1]),show=False)
+
+    for i in range(1, len(spl)):
+        paux = plot(spl[i],(x,inter[i][0],inter[i][1]),show=False)
+        p.append(paux[0])
+
+
+    p2 = get_sympy_subplots(p)
+    p2.plot(v,fx,"o")
+    p2.show()
+
+
 
 
 
@@ -324,4 +494,8 @@ def Newton_interpolation(fx,v):
 
 xx = [2,4,6,8]
 fxx = [4,8,14,16]
-Newton_interpolation(fxx,xx)
+#Newton_interpolation(fxx,xx)
+
+spline_natural([0,0.5,2,1.5],[0,1,2,3])
+
+spline_sujeto([0,0.5,2,1.5],[0,1,2,3],1/5.0,-1)

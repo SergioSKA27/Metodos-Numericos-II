@@ -222,25 +222,106 @@ def Lagrange(v,fx):
     p2.show()
     return sums
 
+def diff_div(v,fx,order):
+    """
+    > The function takes in a list of values, a list of function values, and an order, and returns a list of divided
+    differences
+
+    :param v: the list of x values
+    :param fx: the function you want to differentiate
+    :param order: the order of the derivative you want to take
+    :return: the difference quotient of the function f(x)
+    """
+
+    m = []
+
+    for i in range(0,len(fx)):
+        #print(fx[i])
+        if i + 1 < len(fx) and i +order < len(v):
+            #print(v[i+1],v[i],"/",fx[i+order]," ",fx[i])
+            m.append((fx[i+1]-fx[i])/(v[i+order]-v[i]))
+    return m
+
+def divided_diff(fx,v):
+    """
+    The function takes in a list of x values and a list of f(x) values, and returns a list of lists of divided differences
+
+    :param fx: the function to be interpolated
+    :param v: list of x values
+    :return: The divided difference table is being returned.
+    """
+    x = v
+    nfx = fx
+    m = []
+    for i in range(0,len(v)-1):
+        nx = diff_div(v,nfx,i+1)
+        #print(nx)
+        m.append(nx)
+        nfx = nx
+
+    #print(m)
+    return m
+
+def Newton_interpolation(fx,v):
+    """
+    It takes in a list of x values and a list of f(x) values, and returns a polynomial that interpolates the points
+
+    :param fx: a list of the function values
+    :param v: list of x values
+    :return: The function is being returned.
+    """
+    diff = divided_diff(fx,v)
+    x = symbols('x')
+
+    expr = v[0]
+
+    for i in range(0,len(diff)):
+        s = diff[i][0]
+        p = 1
+        for k in range(0,len(v)):
+
+            p = p*(x-v[k])
+            #print(p, "p",k)
+            if k == i:
+                break
+        s = s * p
+        expr = expr + s
+
+    pprint(expr)
+
+    p = plot(expr,(x,-10,10),show=False)
+    p2 = get_sympy_subplots(p)
+    p2.plot(v,fx,"o")
+    p2.show()
+
+    return expr
 
 
-x,y = symbols('x,y')
-
-s = np.array([x,y])
-ff = np.array([x**3+3*y**2-21,x**2+2*y+2])
-
-p = plot_implicit(ff[0],(x,-10,10),(y,-10,10),show=False)
-p.append((plot_implicit(ff[1],(x,-10,10),(y,-10,10),show=False))[0])
-p2 = get_sympy_subplots(p)
-
-x = newton_method(ff,[1,-1],s)
-print(x)
-p2.plot(x[1],x[2],"o")
-p2.show()
 
 
-vv = [0,math.pi/2,math.pi]
-fxi = [0,1,0]
+
+#x,y = symbols('x,y')
+#
+#s = np.array([x,y])
+#ff = np.array([x**3+3*y**2-21,x**2+2*y+2])
+#
+#p = plot_implicit(ff[0],(x,-10,10),(y,-10,10),show=False)
+#p.append((plot_implicit(ff[1],(x,-10,10),(y,-10,10),show=False))[0])
+#p2 = get_sympy_subplots(p)
+#
+#x = newton_method(ff,[1,-1],s)
+#print(x)
+#p2.plot(x[1],x[2],"o")
+#p2.show()
+#
+#
+#vv = [0,math.pi/2,math.pi]
+#fxi = [0,1,0]
 
 
-Lagrange(vv,fxi)
+#Lagrange(vv,fxi)
+
+
+xx = [2,4,6,8]
+fxx = [4,8,14,16]
+Newton_interpolation(fxx,xx)

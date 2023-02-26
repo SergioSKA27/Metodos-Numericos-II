@@ -561,6 +561,51 @@ def parse_system(st):
     return eq
 
 
+def parse_interpolation(sinter):
+    """
+    It takes a string of the form "a = b\na = b\n" and returns a list of tuples of the form [(a,b),(a,b)]
+
+    :param sinter: the string to be parsed
+    :return: A list of tuples.
+    """
+    params = []
+    s1 = ''
+    s2 = ''
+    flag = False
+    for i in range(0,len(sinter)):
+        if sinter[i] == ' ':
+            continue
+        if sinter[i] == '=':
+            flag = True
+            continue
+        if sinter[i] == '\n':
+            params.append((s1,s2))
+            s1 = ''
+            s2 = ''
+            flag = False
+            continue
+
+        if flag == False:
+            s1 = s1+sinter[i]
+        else:
+            s2 = s2 +sinter[i]
+
+    if len(s1) > 0 and len(s2) > 0:
+            params.append((s1,s2))
+
+    return params
+
+
+def parse_array(sarray):
+    sn = ''
+
+    for i in range(0,len(sarray)):
+        if sarray[i] != ' ' and (sarray[i] != '[' and sarray[i] != ']') and (sarray[i] != '{' and sarray[i] != '}'):
+            sn = sn + sarray[i]
+
+    return list(map(float,sn.split(',')))
+
+
 lisimageL10_1 = []
 countL10_1 = 0
 
@@ -573,6 +618,30 @@ def add_monkeys(window, counter,outputim,filename):
     tktext.image_create(position, image=lisimageL10_1[counter-1])
     #print(str(my_image))
 
+lisimageL11_1 = []
+countL11_1 = 0
+
+def add_monkeys2(window, counter,outputim,filename):
+    tktext = window[outputim].widget
+    global my_image2
+    my_image2 = PhotoImage(file=filename)
+    lisimageL11_1.append(my_image2)
+    position = tktext.index(INSERT)
+    tktext.image_create(position, image=lisimageL11_1[counter-1])
+    #print(str(my_image))
+
+
+lisimageL11_2 = []
+countL11_2 = 0
+
+def add_monkeys3(window, counter,outputim,filename):
+    tktext = window[outputim].widget
+    global my_image3
+    my_image3 = PhotoImage(file=filename)
+    lisimageL11_2.append(my_image3)
+    position = tktext.index(INSERT)
+    tktext.image_create(position, image=lisimageL11_2[counter-1])
+    #print(str(my_image))
 
 
 layout0 = [
@@ -611,8 +680,9 @@ sg.Text('Método de Newton Para Sistemas de Ecuaciones No Lineales')],
 [sg.Text("Ingrese el sistema de Ecuaciones a Resolver\t\t"),sg.Text('Registro del proceso'),
  sg.Button('SOLVE',key='-SolveL10_1-',size=(5,5)),sg.Button('Graficar',key='-PlotL10_1-',size=(5,5))],
 [sg.Text("Valor inicial"),sg.Input("X_0",key='-x0L10_1-',size=(10,10) ),
+ sg.Text("Error"),sg.Input("X_0",key='-errorL10_1-',size=(10,10) ),
  sg.Text("plot range"),sg.Input("X_range",key='-x_rangeplotL10_1-',size=(10,10) ),
- sg.Input("Y_range",key='-y_rangeplotL10_1-',size=(10,10) ),sg.Input("Z_range",key='-z_rangeplotL10_1-' ,size=(10,10))],
+ sg.Input("Y_range",key='-y_rangeplotL10_1-',size=(10,10) )],
 
 [sg.Multiline("x**3+3*y**2-21 = 0\nx**2+2*y+2 = 0",key='-NoLinearSystemL10_1-',size=(30,30),horizontal_scroll=True),
  sg.Multiline("",key='-LogNewtonNoLinear-',size=(80,20),horizontal_scroll=True,auto_refresh=True)],
@@ -639,7 +709,7 @@ sg.Text('Interpolación de Lagrange')],
  sg.Button('SOLVE',key='-SolveL11_1-',size=(5,5))],
 
 
-[sg.Multiline("x = [1,2,3,4] \n f(x) = [1,2,4,5,6]",key='-DataInterpolationL11_1-',size=(30,30),horizontal_scroll=True),
+[sg.Multiline("x = [0,1.570796327,3.141592654] \n f(x) = [0,1,0]",key='-DataInterpolationL11_1-',size=(30,30),horizontal_scroll=True),
  sg.Multiline("",key='-LogLagrangeInter-',size=(80,20),horizontal_scroll=True,auto_refresh=True)],
 
 ]
@@ -655,7 +725,7 @@ sg.Text('Interpolación de Newton')],
  sg.Button('SOLVE',key='-SolveL11_2-',size=(5,5))],
 
 
-[sg.Multiline("x = [1,2,3,4] \n f(x) = [1,2,4,5,6]",key='-DataInterpolationL11_2-',size=(30,30),horizontal_scroll=True),
+[sg.Multiline("x = [2,4,6,8] \n f(x) = [4,8,14,16]",key='-DataInterpolationL11_2-',size=(30,30),horizontal_scroll=True),
  sg.Multiline("",key='-LogNewtonInter-',size=(80,20),horizontal_scroll=True,auto_refresh=True)],
 
 ]
@@ -890,14 +960,95 @@ while True:
         window['-COL{11}-'].update(visible=False)
         window['-COL{111}-'].update(visible=True)
 
+    if event == '-SolveL11_1-':
+
+        try:
+            parseL11_1 = parse_interpolation(values['-DataInterpolationL11_1-'])
+            print(parseL11_1)
+            v11_1 = []
+            fx11_1 = []
+
+            for i in range(0,len(parseL11_1)):
+                if parseL11_1[i][0] == 'x':
+                    v11_1 = parse_array(parseL11_1[i][1])
+                if parseL11_1[i][0] == 'f(x)':
+                    fx11_1 = parse_array(parseL11_1[i][1])
+            #print(v11_1)
+            #print(fx11_1)
+            countL11_1 = 0
+
+
+            solutionL11_1 = Lagrange(v11_1, fx11_1)
+
+            preview("El polinomio de interpolacion es: ",output='png',viewer='file',filename='Lagrange1.png')
+            countL11_1 = countL11_1+1
+            add_monkeys2(window,countL11_1,'-LogLagrangeInter-','Lagrange1.png')
+            window['-LogLagrangeInter-'].update('\n\n', append=True)
+
+            preview(solutionL11_1,output='png',viewer='file',filename='Lagrange2.png')
+            countL11_1 = countL11_1+1
+            add_monkeys2(window,countL11_1,'-LogLagrangeInter-','Lagrange2.png')
+            window['-LogLagrangeInter-'].update('\n\n', append=True)
+
+
+
+        except Exception as e:
+            print(e)
+            sg.popup_ok("Algo Salio Mal intente otra vez :(")
+
+
+
+
+#--------------------------------------------------
     if event == '-NewtonInterpol-':
         window['-COL{11}-'].update(visible=False)
         window['-COL{112}-'].update(visible=True)
 
+    if event == '-SolveL11_2-':
+
+        try:
+            parseL11_2 = parse_interpolation(values['-DataInterpolationL11_2-'])
+            print(parseL11_2)
+            v11_2 = []
+            fx11_2 = []
+
+            for i in range(0,len(parseL11_2)):
+                if parseL11_2[i][0] == 'x':
+                    v11_2 = parse_array(parseL11_2[i][1])
+                if parseL11_2[i][0] == 'f(x)':
+                    fx11_2 = parse_array(parseL11_2[i][1])
+            print(v11_2)
+            print(fx11_2)
+            countL11_2 = 0
+
+
+            solutionL11_2 = Newton_interpolation(fx11_2,v11_2 )
+
+            preview("El polinomio de interpolacion es: ",output='png',viewer='file',filename='Newton1.png')
+            countL11_2 = countL11_2+1
+            add_monkeys3(window,countL11_2,'-LogNewtonInter-','Newton1.png')
+            window['-LogNewtonInter-'].update('\n\n', append=True)
+
+            preview(solutionL11_2,output='png',viewer='file',filename='Newton2.png')
+            countL11_2 = countL11_2+1
+            add_monkeys3(window,countL11_2,'-LogNewtonInter-','Newton2.png')
+            window['-LogNewtonInter-'].update('\n\n', append=True)
+
+
+
+
+
+        except Exception as e:
+            print(e)
+            sg.popup_ok("Algo Salio Mal intente otra vez :(")
+
+
+#--------------------------------------------------
     if event == '-HermiteInterpol-':
         window['-COL{11}-'].update(visible=False)
         window['-COL{113}-'].update(visible=True)
 
+#--------------------------------------------------
     if event == '-SplineInterpol-':
         window['-COL{11}-'].update(visible=False)
         window['-COL{114}-'].update(visible=True)

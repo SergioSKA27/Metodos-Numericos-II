@@ -126,7 +126,7 @@ def NewtonMethod( ff, x0,symb):
     x_np1 = Matrix(np.transpose(np.array(x0)))
     #pprint(x_np1-mm)
 
-    return list(x_np1-mm),
+    return list(x_np1-mm)
 
 def norm_inf(x_0,x_1):
     """
@@ -157,18 +157,17 @@ def newton_method(ff,x_0,symbs):
 
     while True:
         x_1 = NewtonMethod(ff,x_0,symbs)
-        print(x_1[0])
-        ninf = norm_inf(x_0,x_1[0])
+        #print(x_1)
+        ninf = norm_inf(x_0,x_1)
         #print(ninf)
-        prints.append(x_1[1])
 
-        x_0 = list(x_1[0])
+
+        x_0 = list(x_1)
         xs.append(x_0[0])
         ys.append(x_0[1])
         if ninf < 1e-6:
             break
 
-    print(prints)
     return x_0,xs,ys
 
 def get_sympy_subplots(plot:Plot):
@@ -493,6 +492,7 @@ def is_numeric(sn):
         return True
     else:
         return False
+
 def is_operator(sn):
     """
     It checks if the input is an operator.
@@ -563,6 +563,7 @@ def parse_system(st):
 
 lisimageL10_1 = []
 countL10_1 = 0
+
 def add_monkeys(window, counter,outputim,filename):
     tktext = window[outputim].widget
     global my_image
@@ -725,6 +726,7 @@ while True:
         window['-COL{0}-'].update(visible=False)
         window['-COL{10}-'].update(visible=True)
 
+#--------------------------------------------------
 
     if event == '-NoLineaSystemNewton-':
         window['-COL{10}-'].update(visible=False)
@@ -745,31 +747,26 @@ while True:
                 symbs = list(expr[0].free_symbols)
 
                 if len(symbs) == 2:
-                    xr_1 = -10
-                    xr_2 = 10
-                    yr_1 = -10
-                    yr_2 = 10
-                    zr_1 = -10
-                    zr_2 = 10
 
-                    if len(values['-y_rangeplotL10_1-']) > 0 and values['-y_rangeplotL10_1-'] != "Y_range" :
-                        a1 = map(float,values['-y_rangeplotL10_1-'].split(','))
-                        print(list(a1))
-                        yr_1 = float(list(a1)[0])
-                        yr_2 = float(list(a1)[1])
-                        print("HI,",yr_1,yr_2)
 
-                    if len(values['-x_rangeplotL10_1-']) > 0 and values['-x_rangeplotL10_1-'] != "X_range" :
-                        a2 = map(float,values['-x_rangeplotL10_1-'].split(','))
-                        print(list(a2))
-                        xr_1 = min(list(a2))
-                        xr_2 = max(list(a2))
 
-                    if len(values['-z_rangeplotL10_1-']) > 0 and values['-z_rangeplotL10_1-'] != "Z_range" :
-                        a3 = map(float,values['-z_rangeplotL10_1-'].split(','))
-                        print(list(a3))
-                        zr_1 = min(list(a3))
-                        zr_2 = max(list(a3))
+                    try:
+                        xs = list(map(float,values['-x_rangeplotL10_1-'].split(',')))
+                        ys = list(map(float,values['-y_rangeplotL10_1-'].split(',')))
+                        xr_1 = xs[0]
+                        xr_2 = xs[1]
+                        yr_1 = ys[0]
+                        yr_2 = ys[1]
+                        zr_1 = -10
+                        zr_2 = 10
+                    except:
+                        xr_1 = -10
+                        xr_2 = 10
+                        yr_1 = -10
+                        yr_2 = 10
+                        zr_1 = -10
+                        zr_2 = 10
+
 
                     try:
 
@@ -786,7 +783,6 @@ while True:
 
             except:
                 sg.popup_ok("Algo Salio Mal intente otra vez :(")
-
 
     if event == '-SolveL10_1-':
         try:
@@ -812,7 +808,10 @@ while True:
                 symbx = symbs[0]
                 symby = symbs[1]
 
-            jac = jacobian(expr,[symbx,symby])
+            if len(expr) == 2:
+                jac = jacobian(expr,[symbx,symby])
+            else:
+                jac = jacobian(expr,symbs)
 
             slog10_1 = ''
 
@@ -821,17 +820,14 @@ while True:
 
 
 
-            preview(('f(x,y) =',expr[0],'\n'),output='png',viewer='file',filename='NewtonM1.png')
-            preview(('f(x,y) = ',expr[1]),output='png',viewer='file',filename='NewtonM2.png')
+
+            for i in range(0,len(expr)):
+                preview(('f(x,y) =',expr[i],'\n'),output='png',viewer='file',filename='Newton'+str(i)+'.png')
+                countL10_1 = countL10_1 + 1
+                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','Newton'+str(i)+'.png')
+                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
 
 
-            countL10_1 = countL10_1 + 1
-            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM1.png')
-            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-            countL10_1 = countL10_1+1
-            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM2.png')
-            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
 
             preview("Matriz Jacobiana",output='png',viewer='file',filename='NewtonM3.png')
             countL10_1 = countL10_1+1
@@ -844,113 +840,38 @@ while True:
             window['-LogNewtonNoLinear-'].update('\n\n', append=True)
 
 
-            x_0L10_1 = [-1,1]
+            x_0L10_1 = list(map(float,values['-x0L10_1-'].split(',')))
 
-            iterL10_1 = 0
+            preview("Inicial Aprox.",output='png',viewer='file',filename='NewtonAp1.png')
+            countL10_1 = countL10_1+1
+            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonAp1.png')
+            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
 
-            while True:
-                preview("Iteración " +str(iterL10_1),output='png',viewer='file',filename='NewtonM1'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM1'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-                jev = Matrix(eval_matrix(jac,x_0L10_1,[symbx,symby]))
-
-                preview("J(" + str(x_0L10_1) + ")",output='png',viewer='file',filename='NewtonM2'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM2'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-                preview(jev,output='png',viewer='file',filename='NewtonM3'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM3'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-
-                jinv = jev.inv()
-
-                preview("Inv(J(" + str(x_0L10_1) + "))",output='png',viewer='file',filename='NewtonM4'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM4'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-
-                preview(jinv,output='png',viewer='file',filename='NewtonM5'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM5'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-
-                ffev = Matrix(evalVector(np.transpose(expr),x_0L10_1,[symbx,symby]))
-
-
-                preview("F(" + str(x_0L10_1) + ")",output='png',viewer='file',filename='NewtonM6'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM6'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-
-                preview(ffev,output='png',viewer='file',filename='NewtonM7'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM7'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-
-                mm = jinv*ffev
-
-                preview((jinv,'*',ffev),output='png',viewer='file',filename='NewtonM8'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM8'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-
-                preview(mm,output='png',viewer='file',filename='NewtonM9'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM9'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-                x_np1 = Matrix(np.array(x_0L10_1))
-
-
-                preview(("X_n+1 = ",x_np1,'-',mm),output='png',viewer='file',filename='NewtonM8'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM8'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-
-                preview(x_np1-mm,output='png',viewer='file',filename='NewtonM9'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM9'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-                ninsf  = norm_inf(x_0L10_1,x_np1-mm)
-
-
-
-                preview(ninsf,output='png',viewer='file',filename='NewtonM10'+str(iterL10_1)+'.png')
-                countL10_1 = countL10_1+1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM10'+str(iterL10_1)+'.png')
-                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-
-                x_0L10_1 = x_np1-mm
-
-
-
-
-                if ninsf < 1e-6:
-
-
-                    break
-
-                iterL10_1 = iterL10_1+1
+            preview(Matrix(x_0L10_1),output='png',viewer='file',filename='NewtonAp2.png')
+            countL10_1 = countL10_1+1
+            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonAp2.png')
+            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
 
             solutionL10_1 = newton_method(expr,x_0L10_1,symbs)
 
-            preview("La solucion es: " + str(solutionL10_1),output='png',viewer='file',filename='NewtonM12'+str(iterL10_1)+'.png')
+            preview("La solucion es: ",output='png',viewer='file',filename='NewtonM12'+'.png')
             countL10_1 = countL10_1+1
-            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM12'+str(iterL10_1)+'.png')
+            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM12'+'.png')
             window['-LogNewtonNoLinear-'].update('\n\n', append=True)
+
+            preview(Matrix(solutionL10_1[0]),output='png',viewer='file',filename='NewtonM13'+'.png')
+            countL10_1 = countL10_1+1
+            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM13'+'.png')
+            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
+
+
+
+            if len(expr) == 2:
+                p = plot_implicit(expr[0],(symbx,-10,10),(symby,-10,10),show=False)
+                p.append((plot_implicit(expr[1],(symbx,-10,10),(symby,-10,10),show=False))[0])
+                p2 = get_sympy_subplots(p)
+                p2.plot(solutionL10_1[1],solutionL10_1[2],"o")
+                p2.show()
 
             #window.Element('-LogNewtonNoLinear-').update(value=slog10_1)
 
@@ -958,11 +879,12 @@ while True:
             print(e)
             sg.popup_ok("Algo Salio Mal intente otra vez :(")
 
-
+#--------------------------------------------------
     if event == '-InterpolationButton-':
         window['-COL{0}-'].update(visible=False)
         window['-COL{11}-'].update(visible=True)
 
+#--------------------------------------------------
 
     if event == '-LagrangeInterpol-':
         window['-COL{11}-'].update(visible=False)
@@ -980,6 +902,8 @@ while True:
         window['-COL{11}-'].update(visible=False)
         window['-COL{114}-'].update(visible=True)
 
+#--------------------------------------------------
+
     if event == '-returnL0-L10-':
         window['-COL{0}-'].update(visible=True)
         window['-COL{10}-'].update(visible=False)
@@ -988,6 +912,7 @@ while True:
         window['-COL{10}-'].update(visible=True)
         window['-COL{101}-'].update(visible=False)
 
+#--------------------------------------------------
 
     if event == '-returnL0-L11-':
         window['-COL{0}-'].update(visible=True)

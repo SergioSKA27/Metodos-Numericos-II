@@ -601,7 +601,7 @@ layout10 = [
 ]
 
 
-'NewtonM3.png'
+
 layout10_1 =  [
 
 [sg.Button('<--',size=(2,2),key='-returnL10-L10_1-'),
@@ -619,8 +619,74 @@ sg.Text('Método de Newton Para Sistemas de Ecuaciones No Lineales')],
 ]
 
 
+layout11 = [
+[sg.Button('<--',size=(2,2),key='-returnL0-L11-'),sg.Text('MENU INTERPOLACIÓN')],
+
+[sg.Button('Interpolación Polinomica de Lagrange',size=(10,5),key='-LagrangeInterpol-')],
+[sg.Button('Interpolación Polinomica de Newton',size=(10,5),key='-NewtonInterpol-')],
+[sg.Button('Interpolación Polinomica de Hermite',size=(10,5),key='-HermiteInterpol-')],
+[sg.Button('Interpolación Mediante Splines Cubicos',size=(10,5),key='-SplineInterpol-')],
+]
 
 
+layout11_1 =  [
+
+[sg.Button('<--',size=(2,2),key='-returnL11-L11_1-'),
+sg.Text('Interpolación de Lagrange')],
+
+[sg.Text("Ingrese los puntos x y f(x) \t\t"),sg.Text('Registro del proceso'),
+ sg.Button('SOLVE',key='-SolveL11_1-',size=(5,5))],
+
+
+[sg.Multiline("x = [1,2,3,4] \n f(x) = [1,2,4,5,6]",key='-DataInterpolationL11_1-',size=(30,30),horizontal_scroll=True),
+ sg.Multiline("",key='-LogLagrangeInter-',size=(80,20),horizontal_scroll=True,auto_refresh=True)],
+
+]
+
+
+
+layout11_2 =  [
+
+[sg.Button('<--',size=(2,2),key='-returnL11-L11_2-'),
+sg.Text('Interpolación de Newton')],
+
+[sg.Text("Ingrese los puntos x y f(x) \t\t"),sg.Text('Registro del proceso'),
+ sg.Button('SOLVE',key='-SolveL11_2-',size=(5,5))],
+
+
+[sg.Multiline("x = [1,2,3,4] \n f(x) = [1,2,4,5,6]",key='-DataInterpolationL11_2-',size=(30,30),horizontal_scroll=True),
+ sg.Multiline("",key='-LogNewtonInter-',size=(80,20),horizontal_scroll=True,auto_refresh=True)],
+
+]
+
+layout11_3 =  [
+
+[sg.Button('<--',size=(2,2),key='-returnL11-L11_3-'),
+sg.Text('Interpolación de Hermite')],
+
+[sg.Text("Ingrese los puntos x y f(x) \t\t"),sg.Text('Registro del proceso'),
+ sg.Button('SOLVE',key='-SolveL11_3-',size=(5,5))],
+
+
+[sg.Multiline("x = [1,2,3,4] \n f(x) = [1,2,4,5,6]",key='-DataInterpolationL11_3-',size=(30,30),horizontal_scroll=True),
+ sg.Multiline("",key='-LogHermiteInter-',size=(80,20),horizontal_scroll=True,auto_refresh=True)],
+
+]
+
+
+layout11_4 =  [
+
+[sg.Button('<--',size=(2,2),key='-returnL11-L11_4-'),
+sg.Text('Interpolación Mediante Splines Cubicos')],
+
+[sg.Text("Ingrese los puntos x y f(x) \t\t"),sg.Text('Registro del proceso'),
+ sg.Button('SOLVE',key='-SolveL11_1-',size=(5,5))],
+
+
+[sg.Multiline("x = [1,2,3,4] \n f(x) = [1,2,4,5,6]",key='-DataInterpolationL11_1-',size=(30,30),horizontal_scroll=True),
+ sg.Multiline("",key='-LogLagrangeInter-',size=(80,20),horizontal_scroll=True,auto_refresh=True)],
+
+]
 
 
 layout = [
@@ -628,6 +694,13 @@ layout = [
 
      sg.Column(layout=layout10,key='-COL{10}-',visible=False),
      sg.Column(layout=layout10_1,key='-COL{101}-',visible=False),
+
+     sg.Column(layout=layout11,key='-COL{11}-',visible=False),
+     sg.Column(layout=layout11_1,key='-COL{111}-',visible=False),
+     sg.Column(layout=layout11_2,key='-COL{112}-',visible=False),
+     sg.Column(layout=layout11_3,key='-COL{113}-',visible=False),
+     sg.Column(layout=layout11_4,key='-COL{114}-',visible=False),
+
     ]
 ]
 
@@ -651,6 +724,7 @@ while True:
     if event == '-NoLinearEqButton-':
         window['-COL{0}-'].update(visible=False)
         window['-COL{10}-'].update(visible=True)
+
 
     if event == '-NoLineaSystemNewton-':
         window['-COL{10}-'].update(visible=False)
@@ -885,6 +959,26 @@ while True:
             sg.popup_ok("Algo Salio Mal intente otra vez :(")
 
 
+    if event == '-InterpolationButton-':
+        window['-COL{0}-'].update(visible=False)
+        window['-COL{11}-'].update(visible=True)
+
+
+    if event == '-LagrangeInterpol-':
+        window['-COL{11}-'].update(visible=False)
+        window['-COL{111}-'].update(visible=True)
+
+    if event == '-NewtonInterpol-':
+        window['-COL{11}-'].update(visible=False)
+        window['-COL{112}-'].update(visible=True)
+
+    if event == '-HermiteInterpol-':
+        window['-COL{11}-'].update(visible=False)
+        window['-COL{113}-'].update(visible=True)
+
+    if event == '-SplineInterpol-':
+        window['-COL{11}-'].update(visible=False)
+        window['-COL{114}-'].update(visible=True)
 
     if event == '-returnL0-L10-':
         window['-COL{0}-'].update(visible=True)
@@ -893,6 +987,28 @@ while True:
     if event == '-returnL10-L10_1-':
         window['-COL{10}-'].update(visible=True)
         window['-COL{101}-'].update(visible=False)
+
+
+    if event == '-returnL0-L11-':
+        window['-COL{0}-'].update(visible=True)
+        window['-COL{11}-'].update(visible=False)
+
+
+    if event == '-returnL11-L11_1-':
+        window['-COL{11}-'].update(visible=True)
+        window['-COL{111}-'].update(visible=False)
+
+    if event == '-returnL11-L11_2-':
+        window['-COL{11}-'].update(visible=True)
+        window['-COL{112}-'].update(visible=False)
+
+    if event == '-returnL11-L11_3-':
+        window['-COL{11}-'].update(visible=True)
+        window['-COL{113}-'].update(visible=False)
+
+    if event == '-returnL11-L11_4-':
+        window['-COL{11}-'].update(visible=True)
+        window['-COL{114}-'].update(visible=False)
 
 
 

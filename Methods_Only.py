@@ -6,6 +6,7 @@ import sys
 from sympy import *
 from matplotlib import pyplot as plt
 from sympy.plotting.plot import MatplotlibBackend, Plot
+from sympy.plotting import plot3d,plot3d_parametric_line
 
 def jacobian(ff,symb):
     """
@@ -465,37 +466,138 @@ def spline_sujeto(fx,v,fpx0,fpx1 ):
     p2.plot(v,fx,"o")
     p2.show()
 
+def discrete_minimun_quads_aprox(xs,y,functionss,symbs):
+    """
+    Given a set of points $(x_i,y_i)$ and a set of functions (x)$, it finds the linear combination of the functions that
+    best fits the points
+
+    :param xs: list of x values
+    :param y: the y values of the data points
+    :param functionss: a list of functions that will be used to approximate the data
+    :param symbs: the symbol that you want to use for the function
+    :return: The expression of the function that best fits the data.
+    """
+
+    m = []
+
+
+    for i in range(0,len(xs)):
+        aux = []
+
+        for j in range(0,len(functionss)):
+
+            aux.append(functionss[j])
+        m.append(aux)
+
+
+    pprint(Matrix(m))
+
+    mev = []
+    for i in range(0,len(m)):
+        aux = []
+
+        for j in range(0,len(m[0])):
+            if len(m[i][j].free_symbols) > 0:
+                aux.append(m[i][j].subs(symbs,xs[i]))
+            else:
+                aux.append(m[i][j])
+        mev.append(aux)
+
+    pprint(Matrix(mev))
+
+    mevT = Matrix(mev).transpose()
+    pprint(mevT)
+
+    a = mevT*Matrix(mev)
+
+    pprint(a)
+
+    b = mevT*Matrix(y)
+
+    pprint(b)
+
+    ainv = a.inv()
+
+    xsol = ainv*b
+
+    pprint(xsol)
+
+
+    expr = xsol[0]+xsol[1]*symbs
+
+
+    p = plot(expr,show=False)
+    p2 = get_sympy_subplots(p)
+
+    p2.plot(xs,y,"o")
+    p2.show()
+    return expr
+
+def continium_minimun_quads_aprox(fx,interval,symb,degree):
+    """
+    Given a function, an interval, a symbol and a degree, it returns the polynomial that best approximates the function in
+    the given interval
+
+    :param fx: The function to be approximated
+    :param interval: the interval in which the function is defined
+    :param symb: the symbol that will be used to represent the variable in the function
+    :param degree: The degree of the polynomial
+    :return: The function that is the best aproximation of the given function in the given interval.
+    """
+
+    m = []
+
+
+    for i in range(0,degree+1):
+        aux = []
+        for j in range(0,degree+1):
+            aux.append(integrate((symb**i)*(symb**j),(symb,interval[0],interval[1])))
+        m.append(aux)
+
+    pprint(Matrix(m))
+
+
+    b = []
+
+    for i in range(0,degree+1):
+        b.append(integrate((symb**i)*fx,(symb,interval[0],interval[1])))
+
+    pprint(Matrix(b))
+
+    sol = Matrix(m).inv() * Matrix(b)
+
+    expr = 0
+
+    for i in range(0,degree+1):
+        expr = expr + (sol[i]*symb**i)
+
+    pprint(expr)
+
+
+    p = plot(fx,(symb,interval[0],interval[1]),show=False)
+    p.append(plot(expr,(symb,interval[0],interval[1]),show=False)[0])
+
+    p.show()
+
+
+    return expr
 
 
 
 
 
-#x,y = symbols('x,y')
-#
-#s = np.array([x,y])
-#ff = np.array([x**3+3*y**2-21,x**2+2*y+2])
-#
-#p = plot_implicit(ff[0],(x,-10,10),(y,-10,10),show=False)
-#p.append((plot_implicit(ff[1],(x,-10,10),(y,-10,10),show=False))[0])
-#p2 = get_sympy_subplots(p)
-#
-#x = newton_method(ff,[1,-1],s)
-#print(x)
-#p2.plot(x[1],x[2],"o")
-#p2.show()
-#
-#
-#vv = [0,math.pi/2,math.pi]
-#fxi = [0,1,0]
 
 
-#Lagrange(vv,fxi)
 
 
-xx = [2,4,6,8]
-fxx = [4,8,14,16]
-#Newton_interpolation(fxx,xx)
 
-spline_natural([0,0.5,2,1.5],[0,1,2,3])
 
-spline_sujeto([0,0.5,2,1.5],[0,1,2,3],1/5.0,-1)
+
+x = symbols('x')
+
+ff = [(1/x)*x,x]
+#a = ff.subs(x,4)
+#print(a)
+#discrete_minimun_quads_aprox([-1,1,3],[6,1,11],ff,x)
+
+continium_minimun_quads_aprox(sin(math.pi*x),[0,1],x,2)

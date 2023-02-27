@@ -836,7 +836,7 @@ def deleteimages(imgs):
         if os.path.exists(imgs[i]):
             os.remove(imgs[i])
         else:
-            print(">:(")
+            continue
 
 
 
@@ -1044,7 +1044,7 @@ sg.Text('Interpolación Mediante Splines Cubicos')],
 ]
 
 
-#Layout menu de Metodos de Interpolacion
+#Layout menu de Metodos de Aproximacion
 layout12 = [
 [sg.Button('<--',size=(2,2),key='-returnL0-L12-'),sg.Text('MENU METODOS DE APROXIMACION')],
 
@@ -1220,58 +1220,82 @@ while True:
 
 
 
+            try:
+                for i in range(0,len(expr)):
+                    preview(('f(x,y) =',expr[i],'\n'),output='png',viewer='file',filename='Newton'+str(i)+'.png')
+                    countL10_1 = countL10_1 + 1
+                    add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','Newton'+str(i)+'.png')
+                    window['-LogNewtonNoLinear-'].update('\n\n', append=True)
 
-            for i in range(0,len(expr)):
-                preview(('f(x,y) =',expr[i],'\n'),output='png',viewer='file',filename='Newton'+str(i)+'.png')
-                countL10_1 = countL10_1 + 1
-                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','Newton'+str(i)+'.png')
+
+
+                preview("Matriz Jacobiana",output='png',viewer='file',filename='NewtonM3.png')
+                countL10_1 = countL10_1+1
+                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM3.png')
+                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
+
+                preview(Matrix(jac),output='png',viewer='file',filename='NewtonM4.png')
+                countL10_1 = countL10_1+1
+                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM4.png')
+                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
+
+
+                x_0L10_1 = list(map(float,values['-x0L10_1-'].split(',')))
+
+                preview("Inicial Aprox.",output='png',viewer='file',filename='NewtonAp1.png')
+                countL10_1 = countL10_1+1
+                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonAp1.png')
+                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
+
+                preview(Matrix(x_0L10_1),output='png',viewer='file',filename='NewtonAp2.png')
+                countL10_1 = countL10_1+1
+                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonAp2.png')
+                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
+
+                solutionL10_1 = newton_method(expr,x_0L10_1,symbs)
+
+                preview("La solucion es: ",output='png',viewer='file',filename='NewtonM12'+'.png')
+                countL10_1 = countL10_1+1
+                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM12'+'.png')
+                window['-LogNewtonNoLinear-'].update('\n\n', append=True)
+
+                preview(Matrix(solutionL10_1[0]),output='png',viewer='file',filename='NewtonM13'+'.png')
+                countL10_1 = countL10_1+1
+                add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM13'+'.png')
                 window['-LogNewtonNoLinear-'].update('\n\n', append=True)
 
 
 
-            preview("Matriz Jacobiana",output='png',viewer='file',filename='NewtonM3.png')
-            countL10_1 = countL10_1+1
-            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM3.png')
-            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-            preview(Matrix(jac),output='png',viewer='file',filename='NewtonM4.png')
-            countL10_1 = countL10_1+1
-            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM4.png')
-            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-
-            x_0L10_1 = list(map(float,values['-x0L10_1-'].split(',')))
-
-            preview("Inicial Aprox.",output='png',viewer='file',filename='NewtonAp1.png')
-            countL10_1 = countL10_1+1
-            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonAp1.png')
-            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-            preview(Matrix(x_0L10_1),output='png',viewer='file',filename='NewtonAp2.png')
-            countL10_1 = countL10_1+1
-            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonAp2.png')
-            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-            solutionL10_1 = newton_method(expr,x_0L10_1,symbs)
-
-            preview("La solucion es: ",output='png',viewer='file',filename='NewtonM12'+'.png')
-            countL10_1 = countL10_1+1
-            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM12'+'.png')
-            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
-
-            preview(Matrix(solutionL10_1[0]),output='png',viewer='file',filename='NewtonM13'+'.png')
-            countL10_1 = countL10_1+1
-            add_monkeys(window,countL10_1,'-LogNewtonNoLinear-','NewtonM13'+'.png')
-            window['-LogNewtonNoLinear-'].update('\n\n', append=True)
+                if len(expr) == 2:
+                    p = plot_implicit(expr[0],(symbx,-10,10),(symby,-10,10),show=False)
+                    p.append((plot_implicit(expr[1],(symbx,-10,10),(symby,-10,10),show=False))[0])
+                    p2 = get_sympy_subplots(p)
+                    p2.plot(solutionL10_1[1],solutionL10_1[2],"o")
+                    p2.show()
+            except:
+                for i in range(0,len(expr)):
+                    window['-LogNewtonNoLinear-'].update('f(x,y) ='+str(expr[i])+'\n', append=True)
 
 
+                window['-LogNewtonNoLinear-'].update("Matriz Jacobiana"+'\n\n', append=True)
 
-            if len(expr) == 2:
-                p = plot_implicit(expr[0],(symbx,-10,10),(symby,-10,10),show=False)
-                p.append((plot_implicit(expr[1],(symbx,-10,10),(symby,-10,10),show=False))[0])
-                p2 = get_sympy_subplots(p)
-                p2.plot(solutionL10_1[1],solutionL10_1[2],"o")
-                p2.show()
+                window['-LogNewtonNoLinear-'].update(str(jac)+'\n\n', append=True)
+
+
+                x_0L10_1 = list(map(float,values['-x0L10_1-'].split(',')))
+
+
+                window['-LogNewtonNoLinear-'].update("Inicial Aprox."+'\n\n', append=True)
+
+                window['-LogNewtonNoLinear-'].update(str(x_0L10_1)+'\n\n', append=True)
+
+                solutionL10_1 = newton_method(expr,x_0L10_1,symbs)
+
+
+                window['-LogNewtonNoLinear-'].update("La solucion es: "+'\n\n', append=True)
+
+                window['-LogNewtonNoLinear-'].update(str(solutionL10_1[0])+'\n\n', append=True)
+
 
             #window.Element('-LogNewtonNoLinear-').update(value=slog10_1)
 
@@ -1311,15 +1335,20 @@ while True:
 
             solutionL11_1 = Lagrange(v11_1, fx11_1)
 
-            preview("El polinomio de interpolacion es: ",output='png',viewer='file',filename='Lagrange1.png')
-            countL11_1 = countL11_1+1
-            add_monkeys2(window,countL11_1,'-LogLagrangeInter-','Lagrange1.png')
-            window['-LogLagrangeInter-'].update('\n\n', append=True)
+            try:
+                preview("El polinomio de interpolacion es: ",output='png',viewer='file',filename='Lagrange1.png')
+                countL11_1 = countL11_1+1
+                add_monkeys2(window,countL11_1,'-LogLagrangeInter-','Lagrange1.png')
+                window['-LogLagrangeInter-'].update('\n\n', append=True)
 
-            preview(solutionL11_1,output='png',viewer='file',filename='Lagrange2.png')
-            countL11_1 = countL11_1+1
-            add_monkeys2(window,countL11_1,'-LogLagrangeInter-','Lagrange2.png')
-            window['-LogLagrangeInter-'].update('\n\n', append=True)
+                preview(solutionL11_1,output='png',viewer='file',filename='Lagrange2.png')
+                countL11_1 = countL11_1+1
+                add_monkeys2(window,countL11_1,'-LogLagrangeInter-','Lagrange2.png')
+                window['-LogLagrangeInter-'].update('\n\n', append=True)
+            except:
+                window['-LogLagrangeInter-'].update("El polinomio de interpolacion es: "+'\n\n', append=True)
+
+                window['-LogLagrangeInter-'].update(str(solutionL11_1)+'\n\n', append=True)
 
 
 
@@ -1356,16 +1385,20 @@ while True:
 
             solutionL11_2 = Newton_interpolation(fx11_2,v11_2 )
 
-            preview("El polinomio de interpolacion es: ",output='png',viewer='file',filename='Newton1.png')
-            countL11_2 = countL11_2+1
-            add_monkeys3(window,countL11_2,'-LogNewtonInter-','Newton1.png')
-            window['-LogNewtonInter-'].update('\n\n', append=True)
+            try:
+                preview("El polinomio de interpolacion es: ",output='png',viewer='file',filename='Newton1.png')
+                countL11_2 = countL11_2+1
+                add_monkeys3(window,countL11_2,'-LogNewtonInter-','Newton1.png')
+                window['-LogNewtonInter-'].update('\n\n', append=True)
 
-            preview(solutionL11_2,output='png',viewer='file',filename='Newton2.png')
-            countL11_2 = countL11_2+1
-            add_monkeys3(window,countL11_2,'-LogNewtonInter-','Newton2.png')
-            window['-LogNewtonInter-'].update('\n\n', append=True)
+                preview(solutionL11_2,output='png',viewer='file',filename='Newton2.png')
+                countL11_2 = countL11_2+1
+                add_monkeys3(window,countL11_2,'-LogNewtonInter-','Newton2.png')
+                window['-LogNewtonInter-'].update('\n\n', append=True)
+            except:
+                window['-LogNewtonInter-'].update("El polinomio de interpolacion es: "+'\n\n', append=True)
 
+                window['-LogNewtonInter-'].update(str(solutionL11_2)+'\n\n', append=True)
 
 
 
@@ -1415,22 +1448,31 @@ while True:
 
                 solutionL11_4 = spline_natural(fx11_4,v11_4 )
 
-                preview("Los splines son: ",output='png',viewer='file',filename='Spline1.png')
-                countL11_4 = countL11_4+1
-                add_monkeys4(window,countL11_4,'-LogSplineInter-','Spline1.png')
-                window['-LogSplineInter-'].update('\n\n', append=True)
-
-                preview("S(x): ",output='png',viewer='file',filename='Spline2.png')
-                countL11_4 = countL11_4+1
-                add_monkeys4(window,countL11_4,'-LogSplineInter-','Spline2.png')
-                window['-LogSplineInter-'].update('\n\n', append=True)
-
-
-                for i in range(0,len(solutionL11_4)):
-                    preview(solutionL11_4[i],output='png',viewer='file',filename='SplineS'+str(i)+'.png')
+                try:
+                    preview("Los splines son: ",output='png',viewer='file',filename='Spline1.png')
                     countL11_4 = countL11_4+1
-                    add_monkeys4(window,countL11_4,'-LogSplineInter-','SplineS'+str(i)+'.png')
+                    add_monkeys4(window,countL11_4,'-LogSplineInter-','Spline1.png')
                     window['-LogSplineInter-'].update('\n\n', append=True)
+
+                    preview("S(x): ",output='png',viewer='file',filename='Spline2.png')
+                    countL11_4 = countL11_4+1
+                    add_monkeys4(window,countL11_4,'-LogSplineInter-','Spline2.png')
+                    window['-LogSplineInter-'].update('\n\n', append=True)
+
+
+                    for i in range(0,len(solutionL11_4)):
+                        preview(solutionL11_4[i],output='png',viewer='file',filename='SplineS'+str(i)+'.png')
+                        countL11_4 = countL11_4+1
+                        add_monkeys4(window,countL11_4,'-LogSplineInter-','SplineS'+str(i)+'.png')
+                        window['-LogSplineInter-'].update('\n\n', append=True)
+                except:
+                    window['-LogSplineInter-'].update("Los splines son: "+'\n\n', append=True)
+
+                    window['-LogSplineInter-'].update("S(x): "+'\n\n', append=True)
+
+
+                    for i in range(0,len(solutionL11_4)):
+                        window['-LogSplineInter-'].update(str(solutionL11_4[i])+'\n\n', append=True)
 
             except Exception as e:
                 print(e)
@@ -1464,22 +1506,32 @@ while True:
 
                 solutionL11_4 = spline_sujeto(fx11_4,v11_4,fpa,fpb )
 
-                preview("Los splines son: ",output='png',viewer='file',filename='Spline1.png')
-                countL11_4 = countL11_4+1
-                add_monkeys4(window,countL11_4,'-LogSplineInter-','Spline1.png')
-                window['-LogSplineInter-'].update('\n\n', append=True)
-
-                preview("S(x): ",output='png',viewer='file',filename='Spline2.png')
-                countL11_4 = countL11_4+1
-                add_monkeys4(window,countL11_4,'-LogSplineInter-','Spline2.png')
-                window['-LogSplineInter-'].update('\n\n', append=True)
-
-
-                for i in range(0,len(solutionL11_4)):
-                    preview(solutionL11_4[i],output='png',viewer='file',filename='SplineS'+str(i)+'.png')
+                try:
+                    preview("Los splines son: ",output='png',viewer='file',filename='Spline1.png')
                     countL11_4 = countL11_4+1
-                    add_monkeys4(window,countL11_4,'-LogSplineInter-','SplineS'+str(i)+'.png')
+                    add_monkeys4(window,countL11_4,'-LogSplineInter-','Spline1.png')
                     window['-LogSplineInter-'].update('\n\n', append=True)
+
+                    preview("S(x): ",output='png',viewer='file',filename='Spline2.png')
+                    countL11_4 = countL11_4+1
+                    add_monkeys4(window,countL11_4,'-LogSplineInter-','Spline2.png')
+                    window['-LogSplineInter-'].update('\n\n', append=True)
+
+
+                    for i in range(0,len(solutionL11_4)):
+                        preview(solutionL11_4[i],output='png',viewer='file',filename='SplineS'+str(i)+'.png')
+                        countL11_4 = countL11_4+1
+                        add_monkeys4(window,countL11_4,'-LogSplineInter-','SplineS'+str(i)+'.png')
+                        window['-LogSplineInter-'].update('\n\n', append=True)
+                except:
+                    window['-LogSplineInter-'].update("Los splines son: "+'\n\n', append=True)
+
+
+                    window['-LogSplineInter-'].update("S(x): "+'\n\n', append=True)
+
+
+                    for i in range(0,len(solutionL11_4)):
+                        window['-LogSplineInter-'].update(str(solutionL11_4[i])+'\n\n', append=True)
 
 
             except Exception as e:
@@ -1520,78 +1572,96 @@ while True:
             print(fx12_1)
             pprint(Matrix(funcs))
 
-            countL12_1 = 0
+            try:
+                countL12_1 = 0
 
-            preview("X = ",output='png',viewer='file',filename='Discrete1.png')
-            countL12_1 = countL12_1+1
-            add_monkeys5(window,countL12_1,'-LogDisMinQuad-','Discrete1.png')
-            window['-LogDisMinQuad-'].update('\n\n', append=True)
-
-            preview(Matrix(v12_1),output='png',viewer='file',filename='Discrete2.png')
-            countL12_1 = countL12_1+1
-            add_monkeys5(window,countL12_1,'-LogDisMinQuad-','Discrete2.png')
-            window['-LogDisMinQuad-'].update('\n\n', append=True)
-
-
-            preview("Y = ",output='png',viewer='file',filename='Discrete3.png')
-            countL12_1 = countL12_1+1
-            add_monkeys5(window,countL12_1,'-LogDisMinQuad-','Discrete3.png')
-            window['-LogDisMinQuad-'].update('\n\n', append=True)
-
-            preview(Matrix(fx12_1),output='png',viewer='file',filename='Discrete4.png')
-            countL12_1 = countL12_1+1
-            add_monkeys5(window,countL12_1,'-LogDisMinQuad-','Discrete4.png')
-            window['-LogDisMinQuad-'].update('\n\n', append=True)
-
-
-            for i in range(0,len(funcs)):
-                sr = "f"+str(i)+"(x) ="
-                preview(sr,output='png',viewer='file',filename='DiscreteF'+str(i)+'.png')
+                preview("X = ",output='png',viewer='file',filename='Discrete1.png')
                 countL12_1 = countL12_1+1
-                add_monkeys5(window,countL12_1,'-LogDisMinQuad-','DiscreteF'+str(i)+'.png')
+                add_monkeys5(window,countL12_1,'-LogDisMinQuad-','Discrete1.png')
                 window['-LogDisMinQuad-'].update('\n\n', append=True)
 
-                preview(funcs[i],output='png',viewer='file',filename='DiscreteFF'+str(i)+'.png')
+                preview(Matrix(v12_1),output='png',viewer='file',filename='Discrete2.png')
                 countL12_1 = countL12_1+1
-                add_monkeys5(window,countL12_1,'-LogDisMinQuad-','DiscreteFF'+str(i)+'.png')
+                add_monkeys5(window,countL12_1,'-LogDisMinQuad-','Discrete2.png')
                 window['-LogDisMinQuad-'].update('\n\n', append=True)
 
-            symb = ''
 
-            for i in range(0,len(funcs)):
-                if  len (funcs[i].free_symbols) > 0:
-                    symb = list(funcs[i].free_symbols)
-                    break
+                preview("Y = ",output='png',viewer='file',filename='Discrete3.png')
+                countL12_1 = countL12_1+1
+                add_monkeys5(window,countL12_1,'-LogDisMinQuad-','Discrete3.png')
+                window['-LogDisMinQuad-'].update('\n\n', append=True)
 
-            print(symb)
-            solutionL12_1 = discrete_minimun_quads_aprox(v12_1,fx12_1,funcs,symb[0])
-
-
-            preview("La solución esta dada por: ",output='png',viewer='file',filename='DiscreteA1.png')
-            countL12_1 = countL12_1+1
-            add_monkeys5(window,countL12_1,'-LogDisMinQuad-','DiscreteA1.png')
-            window['-LogDisMinQuad-'].update('\n\n', append=True)
-
-            preview(solutionL12_1,output='png',viewer='file',filename='DiscreteA2.png')
-            countL12_1 = countL12_1+1
-            add_monkeys5(window,countL12_1,'-LogDisMinQuad-','DiscreteA2.png')
-            window['-LogDisMinQuad-'].update('\n\n', append=True)
+                preview(Matrix(fx12_1),output='png',viewer='file',filename='Discrete4.png')
+                countL12_1 = countL12_1+1
+                add_monkeys5(window,countL12_1,'-LogDisMinQuad-','Discrete4.png')
+                window['-LogDisMinQuad-'].update('\n\n', append=True)
 
 
+                for i in range(0,len(funcs)):
+                    sr = "f"+str(i)+"(x) ="
+                    preview(sr,output='png',viewer='file',filename='DiscreteF'+str(i)+'.png')
+                    countL12_1 = countL12_1+1
+                    add_monkeys5(window,countL12_1,'-LogDisMinQuad-','DiscreteF'+str(i)+'.png')
+                    window['-LogDisMinQuad-'].update('\n\n', append=True)
+
+                    preview(funcs[i],output='png',viewer='file',filename='DiscreteFF'+str(i)+'.png')
+                    countL12_1 = countL12_1+1
+                    add_monkeys5(window,countL12_1,'-LogDisMinQuad-','DiscreteFF'+str(i)+'.png')
+                    window['-LogDisMinQuad-'].update('\n\n', append=True)
+
+                symb = ''
+
+                for i in range(0,len(funcs)):
+                    if  len (funcs[i].free_symbols) > 0:
+                        symb = list(funcs[i].free_symbols)
+                        break
+
+                #print(symb)
+                solutionL12_1 = discrete_minimun_quads_aprox(v12_1,fx12_1,funcs,symb[0])
+
+
+                preview("La solución esta dada por: ",output='png',viewer='file',filename='DiscreteA1.png')
+                countL12_1 = countL12_1+1
+                add_monkeys5(window,countL12_1,'-LogDisMinQuad-','DiscreteA1.png')
+                window['-LogDisMinQuad-'].update('\n\n', append=True)
+
+                preview(solutionL12_1,output='png',viewer='file',filename='DiscreteA2.png')
+                countL12_1 = countL12_1+1
+                add_monkeys5(window,countL12_1,'-LogDisMinQuad-','DiscreteA2.png')
+                window['-LogDisMinQuad-'].update('\n\n', append=True)
+            except:
+                window['-LogDisMinQuad-'].update("X = "+'\n\n', append=True)
+
+
+                window['-LogDisMinQuad-'].update(str(v12_1)+'\n\n', append=True)
 
 
 
+                window['-LogDisMinQuad-'].update("Y = "+'\n\n', append=True)
 
 
+                window['-LogDisMinQuad-'].update(str(fx12_1)+'\n\n', append=True)
 
 
+                for i in range(0,len(funcs)):
+                    sr = "f"+str(i)+"(x) ="
+                    window['-LogDisMinQuad-'].update(sr+'\n\n', append=True)
+                    window['-LogDisMinQuad-'].update(str(funcs[i])+'\n\n', append=True)
+
+                symb = ''
+
+                for i in range(0,len(funcs)):
+                    if  len (funcs[i].free_symbols) > 0:
+                        symb = list(funcs[i].free_symbols)
+                        break
+
+                #print(symb)
+                solutionL12_1 = discrete_minimun_quads_aprox(v12_1,fx12_1,funcs,symb[0])
 
 
+                window['-LogDisMinQuad-'].update("La solución esta dada por: "+'\n\n', append=True)
 
-
-
-
-
+                window['-LogDisMinQuad-'].update(str(solutionL12_1)+'\n\n', append=True)
 
         except Exception as e:
 
@@ -1627,61 +1697,65 @@ while True:
 
             countL12_2 = 0
 
-            preview("f(x) = ",output='png',viewer='file',filename='Cont1.png')
-            countL12_2 = countL12_2+1
-            add_monkeys6(window,countL12_2,'-LogContMinQuad-','Cont1.png')
-            window['-LogContMinQuad-'].update('\n\n', append=True)
+            try:
+                preview("f(x) = ",output='png',viewer='file',filename='Cont1.png')
+                countL12_2 = countL12_2+1
+                add_monkeys6(window,countL12_2,'-LogContMinQuad-','Cont1.png')
+                window['-LogContMinQuad-'].update('\n\n', append=True)
 
-            preview(fx12_2,output='png',viewer='file',filename='Cont2.png')
-            countL12_2 = countL12_2+1
-            add_monkeys6(window,countL12_2,'-LogContMinQuad-','Cont2.png')
-            window['-LogContMinQuad-'].update('\n\n', append=True)
-
-
-            preview("[a,b] = ",output='png',viewer='file',filename='Cont3.png')
-            countL12_2 = countL12_2+1
-            add_monkeys6(window,countL12_2,'-LogContMinQuad-','Cont3.png')
-            window['-LogContMinQuad-'].update('\n\n', append=True)
-
-            preview(Matrix(v12_2),output='png',viewer='file',filename='Cont4.png')
-            countL12_2 = countL12_2+1
-            add_monkeys6(window,countL12_2,'-LogContMinQuad-','Cont4.png')
-            window['-LogContMinQuad-'].update('\n\n', append=True)
+                preview(fx12_2,output='png',viewer='file',filename='Cont2.png')
+                countL12_2 = countL12_2+1
+                add_monkeys6(window,countL12_2,'-LogContMinQuad-','Cont2.png')
+                window['-LogContMinQuad-'].update('\n\n', append=True)
 
 
+                preview("[a,b] = ",output='png',viewer='file',filename='Cont3.png')
+                countL12_2 = countL12_2+1
+                add_monkeys6(window,countL12_2,'-LogContMinQuad-','Cont3.png')
+                window['-LogContMinQuad-'].update('\n\n', append=True)
 
-
-            symb = list(fx12_2.free_symbols)
-
-
-
-            print(symb)
-            solutionL12_2 = continium_minimun_quads_aprox(fx12_2,v12_2,symb[0],int(degr))
-
-
-            preview("El polinomio de grado "+str(degr)+" esta dado por :",output='png',viewer='file',filename='ContA1.png')
-            countL12_2 = countL12_2+1
-            add_monkeys6(window,countL12_2,'-LogContMinQuad-','ContA1.png')
-            window['-LogContMinQuad-'].update('\n\n', append=True)
-
-            preview(solutionL12_2,output='png',viewer='file',filename='ContA2.png')
-            countL12_2 = countL12_2+1
-            add_monkeys6(window,countL12_2,'-LogContMinQuad-','ContA2.png')
-            window['-LogContMinQuad-'].update('\n\n', append=True)
+                preview(Matrix(v12_2),output='png',viewer='file',filename='Cont4.png')
+                countL12_2 = countL12_2+1
+                add_monkeys6(window,countL12_2,'-LogContMinQuad-','Cont4.png')
+                window['-LogContMinQuad-'].update('\n\n', append=True)
 
 
 
 
+                symb = list(fx12_2.free_symbols)
 
 
 
+                #print(symb)
+                solutionL12_2 = continium_minimun_quads_aprox(fx12_2,v12_2,symb[0],int(degr))
 
 
+                preview("El polinomio de grado "+str(degr)+" esta dado por :",output='png',viewer='file',filename='ContA1.png')
+                countL12_2 = countL12_2+1
+                add_monkeys6(window,countL12_2,'-LogContMinQuad-','ContA1.png')
+                window['-LogContMinQuad-'].update('\n\n', append=True)
 
+                preview(solutionL12_2,output='png',viewer='file',filename='ContA2.png')
+                countL12_2 = countL12_2+1
+                add_monkeys6(window,countL12_2,'-LogContMinQuad-','ContA2.png')
+                window['-LogContMinQuad-'].update('\n\n', append=True)
+            except:
+                window['-LogContMinQuad-'].update("f(x) = "+'\n\n', append=True)
 
+                window['-LogContMinQuad-'].update(str(fx12_2)+'\n\n', append=True)
 
+                window['-LogContMinQuad-'].update("[a,b] = "+'\n\n', append=True)
 
+                window['-LogContMinQuad-'].update(str(v12_2)+'\n\n', append=True)
 
+                symb = list(fx12_2.free_symbols)
+
+                #print(symb)
+                solutionL12_2 = continium_minimun_quads_aprox(fx12_2,v12_2,symb[0],int(degr))
+
+                window['-LogContMinQuad-'].update("El polinomio de grado "+str(degr)+" esta dado por :"+'\n\n', append=True)
+
+                window['-LogContMinQuad-'].update(str(solutionL12_2)+'\n\n', append=True)
 
 
 

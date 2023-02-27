@@ -117,10 +117,10 @@ def NewtonMethod( ff, x0,symb):
     #printing = []
     j = jacobian(ff,symb)
     print("Jacobian Matrix")
-    pprint(Matrix(j))
+    pprint(Matrix(j),use_unicode=False)
     jev = Matrix( eval_matrix(j,x0,symb))
     print("J(",x0,")")
-    pprint(jev)
+    pprint(jev,use_unicode=False)
 
 
     jinv = jev.inv()
@@ -131,11 +131,11 @@ def NewtonMethod( ff, x0,symb):
     print("J^-1(",x0,")*","F(",x0,")")
 
     mm = Matrix(jinv)*ffev
-    pprint(mm)
+    pprint(mm,use_unicode=False)
 
     x_np1 = Matrix(np.transpose(np.array(x0)))
     print("X_n+1 = ")
-    pprint(Matrix(x_np1-mm))
+    pprint(Matrix(x_np1-mm),use_unicode=False)
 
     return list(x_np1-mm)
 
@@ -166,7 +166,7 @@ def newton_method(ff,x_0,symbs):
     print("METODO DE NEWTON SISTEMAS DE ECUACIONES NO LINEALES")
 
     print("Aproximación Inicial:")
-    pprint(Matrix(x_0))
+    pprint(Matrix(x_0),use_unicode=False)
     xs = []
     ys = []
     itercount = 0
@@ -192,7 +192,7 @@ def newton_method(ff,x_0,symbs):
         itercount = itercount + 1
 
     print("La Solucion es: ")
-    pprint(Matrix(x_0))
+    pprint(Matrix(x_0),use_unicode=False)
 
     return x_0,xs,ys
 
@@ -244,9 +244,9 @@ def Lagrange(v,fx):
     print("INTERPOLACION POLINOMICA DE LAGRANGE ")
 
     print("x = ")
-    pprint(Matrix(v))
+    pprint(Matrix(v),use_unicode=False)
     print("f(x) = ")
-    pprint(Matrix(fx))
+    pprint(Matrix(fx),use_unicode=False)
     lis = []
     for i in range(0,len(v)):
         lis.append(li(v,i))
@@ -254,7 +254,7 @@ def Lagrange(v,fx):
     print("Polinomios de Lagrange (Li)")
     for i in range(0,len(lis)):
         print("L_"+str(i)+" = ")
-        pprint(lis[i])
+        pprint(lis[i],use_unicode=False)
 
     sums = 0
 
@@ -265,7 +265,7 @@ def Lagrange(v,fx):
 
     simplify(sums)
 
-    pprint(sums)
+    pprint(sums,use_unicode=False)
 
     p1 = textplot(sums,min(v),max(v))
     #p2 = get_sympy_subplots(p1)
@@ -325,9 +325,9 @@ def Newton_interpolation(fx,v):
 
     print("INTERPOLACION POLINOMICA DE NEWTON")
     print("x = ")
-    pprint(Matrix(v))
+    pprint(Matrix(v),use_unicode=False)
     print("f(x) = ")
-    pprint(Matrix(fx))
+    pprint(Matrix(fx),use_unicode=False)
     diff = divided_diff(fx,v)
     x = symbols('x')
 
@@ -335,7 +335,7 @@ def Newton_interpolation(fx,v):
 
     print("Diferencias Divididas: ")
     for i in diff:
-        pprint(Matrix(i))
+        pprint(Matrix(i),use_unicode=False)
 
     for i in range(0,len(diff)):
         s = diff[i][0]
@@ -350,7 +350,7 @@ def Newton_interpolation(fx,v):
         expr = expr + s
 
     print("El Polinomio de interpolacion esta dado por: ")
-    pprint(expr)
+    pprint(expr,use_unicode=False)
 
     p = textplot(expr,min(v),max(v))
     #p2 = get_sympy_subplots(p)
@@ -372,9 +372,9 @@ def spline_natural(fx,v):
     print("Interpolacion por medio de Splines Cubicos(Natural)")
 
     print("x = ")
-    pprint(Matrix(v))
+    pprint(Matrix(v),use_unicode=False)
     print("f(x) = ")
-    pprint(Matrix(fx))
+    pprint(Matrix(fx),use_unicode=False)
 
     inter = []
     fxinter = []
@@ -384,7 +384,7 @@ def spline_natural(fx,v):
         inter.append((v[i],v[i+1]))
         fxinter.append((fx[i],fx[i+1]))
 
-    print(inter)
+    #print(inter)
     for i in range(0,len(inter)):
         hi.append(inter[i][1]-inter[i][0])
 
@@ -403,7 +403,7 @@ def spline_natural(fx,v):
                     m[i][j+1] = hi[i]
 
     print("A = ")
-    pprint(Matrix(m))
+    pprint(Matrix(m),use_unicode=False)
 
     b = np.zeros(len(v))
 
@@ -411,11 +411,11 @@ def spline_natural(fx,v):
         b[i] = ((1/hi[i])*(fx[i+1]-fx[i]))-((1/hi[i-1])*(fx[i]-fx[i-1]))
 
     print("b0 = ")
-    pprint(Matrix(b.transpose()))
+    pprint(Matrix(b.transpose()),use_unicode=False)
 
     print("A*b0 = c ---> c = ")
     c = (Matrix(m).inv())*Matrix(b.transpose())
-    pprint(Matrix(c))
+    pprint(Matrix(c),use_unicode=False)
     b = []
 
     for i in range(0,len(hi)):
@@ -423,7 +423,7 @@ def spline_natural(fx,v):
 
     print("b = ")
 
-    pprint(Matrix(b))
+    pprint(Matrix(b),use_unicode=False)
 
     d = []
 
@@ -431,7 +431,7 @@ def spline_natural(fx,v):
         d.append((c[i+1]-c[i])/(3*hi[i]))
 
     print("d = ")
-    pprint(Matrix(d))
+    pprint(Matrix(d),use_unicode=False)
 
 
     x = symbols('x')
@@ -440,16 +440,16 @@ def spline_natural(fx,v):
         spl.append(fx[i]+ (b[i]*(x-v[i]))+(c[i]*((x-v[i])**2)) + (d[i]*((x-v[i])**3)))
 
     print("Los Splines son: ")
-    pprint(Matrix(spl))
+    pprint(Matrix(spl),use_unicode=False)
 
 
     print("SPLINE_0 = ")
-    pprint((spl[0]))
+    pprint((spl[0]),use_unicode=False)
     p = textplot(spl[0], inter[0][0],inter[0][1])
 
     for i in range(1, len(spl)):
         print("SPLINE_"+str(i)+" = ")
-        pprint(spl[i])
+        pprint(spl[i],use_unicode=False)
         paux = textplot(spl[i],inter[i][0],inter[i][1])
 
 
@@ -474,9 +474,9 @@ def spline_sujeto(fx,v,fpx0,fpx1 ):
     print("Interpolacion por medio de Splines Cubicos(Sujeto)")
 
     print("x = ")
-    pprint(Matrix(v))
+    pprint(Matrix(v),use_unicode=False)
     print("f(x) = ")
-    pprint(Matrix(fx))
+    pprint(Matrix(fx),use_unicode=False)
 
     print("f'(a) =", fpx0)
     print("f'(b) =", fpx1)
@@ -490,7 +490,7 @@ def spline_sujeto(fx,v,fpx0,fpx1 ):
         inter.append((v[i],v[i+1]))
         fxinter.append((fx[i],fx[i+1]))
 
-    print(inter)
+    #print(inter)
     for i in range(0,len(inter)):
         hi.append(inter[i][1]-inter[i][0])
 
@@ -521,21 +521,21 @@ def spline_sujeto(fx,v,fpx0,fpx1 ):
         b[i] = ((3/hi[i])*(fx[i+1]-fx[i]))-((3/hi[i-1])*(fx[i]-fx[i-1]))
 
     print("A =")
-    pprint(Matrix(m))
+    pprint(Matrix(m),use_unicode=False)
     print("b0 = ")
-    pprint(Matrix(b.transpose()))
+    pprint(Matrix(b.transpose()),use_unicode=False)
 
     print("A*b0 = c ---> c = ")
 
     c = (Matrix(m).inv())*Matrix(b.transpose())
-    pprint(Matrix(c))
+    pprint(Matrix(c),use_unicode=False)
     b = []
 
     for i in range(0,len(hi)):
         b.append(((fx[i+1]-fx[i])/hi[i])-((((2*c[i])+c[i+1])*hi[i])/3))
 
     print("b = ")
-    pprint(Matrix(b))
+    pprint(Matrix(b),use_unicode=False)
 
     d = []
 
@@ -543,7 +543,7 @@ def spline_sujeto(fx,v,fpx0,fpx1 ):
         d.append((c[i+1]-c[i])/(3*hi[i]))
 
     print("d = ")
-    pprint(Matrix(d))
+    pprint(Matrix(d),use_unicode=False)
 
 
     x = symbols('x')
@@ -552,17 +552,17 @@ def spline_sujeto(fx,v,fpx0,fpx1 ):
         spl.append(fx[i]+ (b[i]*(x-v[i]))+(c[i]*((x-v[i])**2)) + (d[i]*((x-v[i])**3)))
 
     print("Los Splines son: ")
-    pprint(Matrix(spl))
+    pprint(Matrix(spl),use_unicode=False)
 
 
 
     print("SPLINE_0 = ")
-    pprint((spl[0]))
+    pprint((spl[0]),use_unicode=False)
     p = textplot(spl[0], inter[0][0],inter[0][1])
 
     for i in range(1, len(spl)):
         print("SPLINE_"+str(i)+" = ")
-        pprint(spl[i])
+        pprint(spl[i],use_unicode=False)
         paux = textplot(spl[i],inter[i][0],inter[i][1])
 
 
@@ -571,6 +571,133 @@ def spline_sujeto(fx,v,fpx0,fpx1 ):
     #p2.show()
 
     return spl
+
+def discrete_minimun_quads_aprox(xs,y,functionss,symbs):
+    """
+    Given a set of points $(x_i,y_i)$ and a set of functions (x)$, it finds the linear combination of the functions that
+    best fits the points
+
+    :param xs: list of x values
+    :param y: the y values of the data points
+    :param functionss: a list of functions that will be used to approximate the data
+    :param symbs: the symbol that you want to use for the function
+    :return: The expression of the function that best fits the data.
+    """
+
+    system(CLEARW)
+    print("APROXIMACION DISCRETA POR MINIMOS CUADRADOS")
+
+    m = []
+
+
+    for i in range(0,len(xs)):
+        aux = []
+
+        for j in range(0,len(functionss)):
+
+            aux.append(functionss[j])
+        m.append(aux)
+
+    print("M = ")
+    #pprint(Matrix(m))
+
+    mev = []
+    for i in range(0,len(m)):
+        aux = []
+
+        for j in range(0,len(m[0])):
+            if len(m[i][j].free_symbols) > 0:
+                aux.append(m[i][j].subs(symbs,xs[i]))
+            else:
+                aux.append(m[i][j])
+        mev.append(aux)
+
+    pprint(Matrix(mev),use_unicode=False)
+
+    mevT = Matrix(mev).transpose()
+    print("M^T = ")
+    pprint(mevT,use_unicode=False)
+
+    a = mevT*Matrix(mev)
+
+    print("A = M^T * M")
+    pprint(a,use_unicode=False)
+
+    b = mevT*Matrix(y)
+
+
+    print("b = M^T * y")
+    pprint(b,use_unicode=False)
+
+    ainv = a.inv()
+    print("Ax = b ---> x = ")
+    xsol = ainv*b
+
+    pprint(xsol,use_unicode=False)
+
+    print("El la recta esta dada esta dado por: ")
+    expr = xsol[0]+xsol[1]*symbs
+    pprint(expr,use_unicode=False)
+
+
+    p = textplot(expr,min(xs),max(xs))
+
+    return expr
+
+def continium_minimun_quads_aprox(fx,interval,symb,degree):
+    """
+    Given a function, an interval, a symbol and a degree, it returns the polynomial that best approximates the function in
+    the given interval
+
+    :param fx: The function to be approximated
+    :param interval: the interval in which the function is defined
+    :param symb: the symbol that will be used to represent the variable in the function
+    :param degree: The degree of the polynomial
+    :return: The function that is the best aproximation of the given function in the given interval.
+    """
+    system(CLEARW)
+    print("APROXIMACION DISCRETA POR MINIMOS CUADRADOS")
+    m = []
+
+
+    for i in range(0,degree+1):
+        aux = []
+        for j in range(0,degree+1):
+            aux.append(integrate((symb**i)*(symb**j),(symb,interval[0],interval[1])))
+        m.append(aux)
+
+    print("M =  ")
+    pprint(Matrix(m),use_unicode=False)
+
+
+    b = []
+
+    for i in range(0,degree+1):
+        b.append(integrate((symb**i)*fx,(symb,interval[0],interval[1])))
+
+    print("b = ")
+    pprint(Matrix(b))
+
+    print("M*x = b ---> x = ")
+
+    sol = Matrix(m).inv() * Matrix(b)
+    pprint(Matrix(sol),use_unicode=False)
+    expr = 0
+
+    for i in range(0,degree+1):
+        expr = expr + (sol[i]*symb**i)
+
+    print("La solucion esta dada por \n")
+    pprint(expr,use_unicode=False)
+
+    pprint(fx,use_unicode=False)
+    p = textplot(fx,interval[0],interval[1])
+    pprint(expr,use_unicode=False)
+    p2 = textplot(expr,interval[0],interval[1])
+
+
+
+    return expr
 
 
 
@@ -875,6 +1002,47 @@ sg.Text('Interpolación Mediante Splines Cubicos')],
 ]
 
 
+
+#Layout menu de Metodos de Aproximacion
+layout12 = [
+[sg.Button('<--',size=(2,2),key='-returnL0-L12-'),sg.Text('MENU METODOS DE APROXIMACION')],
+
+[sg.Button('Aproximacion discreta de minimos cuadrados',size=(10,5),key='-DisminQuadAprox-')],
+[sg.Button('Aproximacion continua de minimos cuadrados',size=(10,5),key='-ContminQuadAprox-')],
+]
+
+
+layout12_1 =  [
+
+[sg.Button('<--',size=(2,2),key='-returnL12-L12_1-'),
+sg.Text('Aproximacion discreta de minimos cuadrados')],
+
+[sg.Text("Ingrese los puntos x e y las funciones f_i(x) \t\t"),sg.Text('Registro del proceso'),
+ sg.Button('SOLVE',key='-SolveL12_1-',size=(5,5))],
+
+
+[sg.Multiline("x = [-1,1,3] \n y = [6,1,11]\n f_1(x) = 1 \n f_2(x) = x",key='-DataAproximationL12_1-',size=(30,30),horizontal_scroll=True),
+ sg.Multiline("",key='-LogDisMinQuad-',size=(80,20),horizontal_scroll=True,auto_refresh=True)],
+
+]
+
+
+layout12_2 =  [
+
+[sg.Button('<--',size=(2,2),key='-returnL12-L12_2-'),
+sg.Text('Aproximacion continua de minimos cuadrados')],
+
+[sg.Text("Ingrese la funcion y el intervalo \t\t"),sg.Text('Registro del proceso'),
+ sg.Button('SOLVE',key='-SolveL12_2-',size=(5,5))],
+
+
+[sg.Multiline("f(x) = sin(3.141592*x) \n I = [0,1]\n D = 2",key='-DataAproximationL12_2-',size=(30,30),horizontal_scroll=True),
+ sg.Multiline("",key='-LogContMinQuad-',size=(80,20),horizontal_scroll=True,auto_refresh=True)],
+
+]
+
+
+
 layout = [
     [sg.Column(layout=layout0,key='-COL{0}-',visible=True),
 
@@ -886,6 +1054,10 @@ layout = [
      sg.Column(layout=layout11_2,key='-COL{112}-',visible=False),
      sg.Column(layout=layout11_3,key='-COL{113}-',visible=False),
      sg.Column(layout=layout11_4,key='-COL{114}-',visible=False),
+
+     sg.Column(layout=layout12,key='-COL{12}-',visible=False),
+     sg.Column(layout=layout12_1,key='-COL{121}-',visible=False),
+     sg.Column(layout=layout12_2,key='-COL{122}-',visible=False),
 
     ]
 ]
@@ -1077,9 +1249,7 @@ while True:
             solutionL11_1 = Lagrange(v11_1, fx11_1)
 
 
-            window['-LogLagrangeInter-'].update("El polinomio de interpolacion es: "+'\n\n', append=True)
 
-            window['-LogLagrangeInter-'].update(str(solutionL11_1)+'\n\n', append=True)
 
 
 
@@ -1225,6 +1395,172 @@ while True:
                 print(e)
                 sg.popup_ok("Algo Salio Mal intente otra vez :(")
 
+#--------------------------------------------------
+
+    if event == '-AproximationsButton-':
+        window['-COL{0}-'].update(visible=False)
+        window['-COL{12}-'].update(visible=True)
+
+    if event == '-DisminQuadAprox-':
+        window['-COL{12}-'].update(visible=False)
+        window['-COL{121}-'].update(visible=True)
+
+    if event == '-SolveL12_1-':
+        window.Element('-LogDisMinQuad-').update(value="")
+        lisimageL12_1 = []
+        try:
+            parseL12_1 = parse_interpolation(values['-DataAproximationL12_1-'])
+            print(parseL12_1)
+
+            v12_1 = []
+            fx12_1 = []
+            funcs = []
+
+            for i in range(0,len(parseL12_1)):
+                if parseL12_1[i][0] == 'x':
+                    v12_1 = parse_array(parseL12_1[i][1])
+                elif parseL12_1[i][0] == 'y':
+                    fx12_1 = parse_array(parseL12_1[i][1])
+                else:
+                    funcs.append(parse_expr(parseL12_1[i][1]))
+
+            print(v12_1)
+            print(fx12_1)
+            pprint(Matrix(funcs))
+
+            countL12_1 = 0
+
+
+            window['-LogDisMinQuad-'].update("X = "+'\n\n', append=True)
+
+
+            window['-LogDisMinQuad-'].update(str(v12_1)+'\n\n', append=True)
+
+
+
+            window['-LogDisMinQuad-'].update("Y = "+'\n\n', append=True)
+
+
+            window['-LogDisMinQuad-'].update(str(fx12_1)+'\n\n', append=True)
+
+
+            for i in range(0,len(funcs)):
+                sr = "f"+str(i)+"(x) ="
+                window['-LogDisMinQuad-'].update(sr+'\n\n', append=True)
+                window['-LogDisMinQuad-'].update(str(funcs[i])+'\n\n', append=True)
+
+            symb = ''
+
+            for i in range(0,len(funcs)):
+                if  len (funcs[i].free_symbols) > 0:
+                    symb = list(funcs[i].free_symbols)
+                    break
+
+            #print(symb)
+            solutionL12_1 = discrete_minimun_quads_aprox(v12_1,fx12_1,funcs,symb[0])
+
+
+            window['-LogDisMinQuad-'].update("La solución esta dada por: "+'\n\n', append=True)
+
+            window['-LogDisMinQuad-'].update(str(solutionL12_1)+'\n\n', append=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        except Exception as e:
+
+            print(e)
+            sg.popup_ok("Algo Salio Mal intente otra vez :(")
+
+    if event == '-ContminQuadAprox-':
+        window['-COL{12}-'].update(visible=False)
+        window['-COL{122}-'].update(visible=True)
+
+    if event == '-SolveL12_2-':
+        window.Element('-LogContMinQuad-').update(value="")
+        lisimageL12_2 = []
+        try:
+            parseL12_2 = parse_interpolation(values['-DataAproximationL12_2-'])
+            print(parseL12_2)
+
+            v12_2 = []
+            fx12_2 = []
+            degr= 0
+
+            for i in range(0,len(parseL12_2)):
+                if parseL12_2[i][0] == 'f(x)':
+                    fx12_2 = parse_expr(parseL12_2[i][1])
+                elif parseL12_2[i][0] == 'I':
+                    v12_2 = parse_array(parseL12_2[i][1])
+                elif parseL12_2[i][0] == 'D':
+                    degr = (float(parseL12_2[i][1]))
+
+            pprint(Matrix(v12_2))
+            pprint(fx12_2)
+            print(degr)
+
+            countL12_2 = 0
+
+
+            window['-LogContMinQuad-'].update("f(x) = "+'\n\n', append=True)
+
+            window['-LogContMinQuad-'].update(str(fx12_2)+'\n\n', append=True)
+
+
+
+            window['-LogContMinQuad-'].update("[a,b] = "+'\n\n', append=True)
+
+            window['-LogContMinQuad-'].update(str(v12_2)+'\n\n', append=True)
+
+
+
+
+            symb = list(fx12_2.free_symbols)
+
+
+
+            #print(symb)
+            solutionL12_2 = continium_minimun_quads_aprox(fx12_2,v12_2,symb[0],int(degr))
+
+
+
+            window['-LogContMinQuad-'].update("El polinomio de grado "+str(degr)+" esta dado por :"+'\n\n', append=True)
+
+            window['-LogContMinQuad-'].update(str(solutionL12_2)+'\n\n', append=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        except Exception as e:
+
+            print(e)
+            sg.popup_ok("Algo Salio Mal intente otra vez :(")
 
 #--------------------------------------------------
 
@@ -1258,6 +1594,20 @@ while True:
     if event == '-returnL11-L11_4-':
         window['-COL{11}-'].update(visible=True)
         window['-COL{114}-'].update(visible=False)
+
+#--------------------------------------------------
+
+    if event == '-returnL0-L12-':
+        window['-COL{0}-'].update(visible=True)
+        window['-COL{12}-'].update(visible=False)
+
+    if event == '-returnL12-L12_1-':
+        window['-COL{12}-'].update(visible=True)
+        window['-COL{121}-'].update(visible=False)
+
+    if event == '-returnL12-L12_2-':
+        window['-COL{12}-'].update(visible=True)
+        window['-COL{122}-'].update(visible=False)
 
 
 

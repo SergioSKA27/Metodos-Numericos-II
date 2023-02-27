@@ -13,6 +13,7 @@ from tkinter import END, INSERT
 from tkinter import *
 from os import system
 import platform
+import os
 
 if platform.system() == 'Linux':
     CLEARW = 'clear'
@@ -579,6 +580,9 @@ def discrete_minimun_quads_aprox(xs,y,functionss,symbs):
     :return: The expression of the function that best fits the data.
     """
 
+    system(CLEARW)
+    print("APROXIMACION DISCRETA POR MINIMOS CUADRADOS")
+
     m = []
 
 
@@ -590,8 +594,8 @@ def discrete_minimun_quads_aprox(xs,y,functionss,symbs):
             aux.append(functionss[j])
         m.append(aux)
 
-
-    pprint(Matrix(m))
+    print("M = ")
+    #pprint(Matrix(m))
 
     mev = []
     for i in range(0,len(m)):
@@ -607,24 +611,29 @@ def discrete_minimun_quads_aprox(xs,y,functionss,symbs):
     pprint(Matrix(mev))
 
     mevT = Matrix(mev).transpose()
+    print("M^T = ")
     pprint(mevT)
 
     a = mevT*Matrix(mev)
 
+    print("A = M^T * M")
     pprint(a)
 
     b = mevT*Matrix(y)
 
+
+    print("b = M^T * y")
     pprint(b)
 
     ainv = a.inv()
-
+    print("Ax = b ---> x = ")
     xsol = ainv*b
 
     pprint(xsol)
 
-
+    print("El la recta esta dada esta dado por: ")
     expr = xsol[0]+xsol[1]*symbs
+    pprint(expr)
 
 
     p = plot(expr,show=False)
@@ -645,7 +654,8 @@ def continium_minimun_quads_aprox(fx,interval,symb,degree):
     :param degree: The degree of the polynomial
     :return: The function that is the best aproximation of the given function in the given interval.
     """
-
+    system(CLEARW)
+    print("APROXIMACION DISCRETA POR MINIMOS CUADRADOS")
     m = []
 
 
@@ -655,6 +665,7 @@ def continium_minimun_quads_aprox(fx,interval,symb,degree):
             aux.append(integrate((symb**i)*(symb**j),(symb,interval[0],interval[1])))
         m.append(aux)
 
+    print("M =  ")
     pprint(Matrix(m))
 
 
@@ -663,15 +674,19 @@ def continium_minimun_quads_aprox(fx,interval,symb,degree):
     for i in range(0,degree+1):
         b.append(integrate((symb**i)*fx,(symb,interval[0],interval[1])))
 
+    print("b = ")
     pprint(Matrix(b))
 
-    sol = Matrix(m).inv() * Matrix(b)
+    print("M*x = b ---> x = ")
 
+    sol = Matrix(m).inv() * Matrix(b)
+    pprint(Matrix(sol))
     expr = 0
 
     for i in range(0,degree+1):
         expr = expr + (sol[i]*symb**i)
 
+    print("La solucion esta dada por \n")
     pprint(expr)
 
 
@@ -816,6 +831,17 @@ def parse_array(sarray):
     return list(map(float,sn.split(',')))
 
 
+def deleteimages(imgs):
+    for i in range(0,len(imgs)):
+        if os.path.exists(imgs[i]):
+            os.remove(imgs[i])
+        else:
+            print(">:(")
+
+
+
+imagesesions = []
+
 lisimageL10_1 = []
 countL10_1 = 0
 
@@ -824,6 +850,7 @@ def add_monkeys(window, counter,outputim,filename):
     global my_image
     my_image = PhotoImage(file=filename)
     lisimageL10_1.append(my_image)
+    imagesesions.append(filename)
     position = tktext.index(INSERT)
     tktext.image_create(position, image=lisimageL10_1[counter-1])
     #print(str(my_image))
@@ -836,6 +863,7 @@ def add_monkeys2(window, counter,outputim,filename):
     global my_image2
     my_image2 = PhotoImage(file=filename)
     lisimageL11_1.append(my_image2)
+    imagesesions.append(filename)
     position = tktext.index(INSERT)
     tktext.image_create(position, image=lisimageL11_1[counter-1])
     #print(str(my_image))
@@ -849,6 +877,7 @@ def add_monkeys3(window, counter,outputim,filename):
     global my_image3
     my_image3 = PhotoImage(file=filename)
     lisimageL11_2.append(my_image3)
+    imagesesions.append(filename)
     position = tktext.index(INSERT)
     tktext.image_create(position, image=lisimageL11_2[counter-1])
     #print(str(my_image))
@@ -863,6 +892,7 @@ def add_monkeys4(window, counter,outputim,filename):
     global my_image4
     my_image4 = PhotoImage(file=filename)
     lisimageL11_4.append(my_image4)
+    imagesesions.append(filename)
     position = tktext.index(INSERT)
     tktext.image_create(position, image=lisimageL11_4[counter-1])
     #print(str(my_image))
@@ -876,6 +906,7 @@ def add_monkeys5(window, counter,outputim,filename):
     global my_image5
     my_image5 = PhotoImage(file=filename)
     lisimageL12_1.append(my_image5)
+    imagesesions.append(filename)
     position = tktext.index(INSERT)
     tktext.image_create(position, image=lisimageL12_1[counter-1])
     #print(str(my_image))
@@ -889,6 +920,7 @@ def add_monkeys6(window, counter,outputim,filename):
     global my_image6
     my_image6 = PhotoImage(file=filename)
     lisimageL12_2.append(my_image6)
+    imagesesions.append(filename)
     position = tktext.index(INSERT)
     tktext.image_create(position, image=lisimageL12_2[counter-1])
     #print(str(my_image))
@@ -1083,6 +1115,7 @@ window = sg.Window('Métodos Numéricos ', layout,size=(720,480),resizable=True)
 
 matop = '+'
 #Event Loop to process "events" and get the "values" of the inputs
+init_printing()
 while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
@@ -1152,7 +1185,6 @@ while True:
                 sg.popup_ok("Algo Salio Mal intente otra vez :(")
 
     if event == '-SolveL10_1-':
-        lisimageL10_1 = []
         try:
             window.Element('-LogNewtonNoLinear-').update(value="")
             eq = parse_system(values['-NoLinearSystemL10_1-'])
@@ -1710,5 +1742,5 @@ while True:
     #print(values,"Valuessss")
 
 window.close()
-
+deleteimages(imagesesions)
 lisimageL11_1 = []

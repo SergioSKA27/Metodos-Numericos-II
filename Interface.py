@@ -20,7 +20,7 @@ if platform.system() == 'Linux':
 elif platform.system() ==  'Windows':
     CLEARW = 'cls'
 
-#This version needs latex and matplotlib to work properly :)
+#This version needs latex(Tex Live) and matplotlib to work properly :)
 
 def jacobian(ff,symb):
     """
@@ -100,7 +100,7 @@ def evalVector(ff, x0,symb):
         v.append(ff[i].subs(ev).evalf())
     return np.array(v)
 
-def NewtonMethod( ff, x0,symb):
+def NewtonMethod( ff, x0,symb ):
     """
     The function takes in a vector of functions, a vector of initial guesses, and a vector of symbols. It then calculates
     the Jacobian matrix, the Jacobian matrix evaluated at the initial guess, the inverse of the Jacobian matrix evaluated at
@@ -113,30 +113,21 @@ def NewtonMethod( ff, x0,symb):
     :param symb: the symbols used in the function
     :return: The return value is the x_np1 value.
     """
-
-    #printing = []
     j = jacobian(ff,symb)
-    print("Jacobian Matrix")
-    pprint(Matrix(j))
+    #print("Jacobian Matrix")
+    #pprint(Matrix(j))
     jev = Matrix( eval_matrix(j,x0,symb))
-    print("J(",x0,")")
-    pprint(jev)
-
+    #print("J(",x0,")")
+    #pprint(jev)
 
     jinv = jev.inv()
-
-    print("F(",x0,")")
-
+    #print("F(",x0,")")
     ffev = Matrix(evalVector(np.transpose(ff),x0,symb))
-    print("J^-1(",x0,")*","F(",x0,")")
-
+    #print("J^-1(",x0,")*","F(",x0,")")
     mm = Matrix(jinv)*ffev
-    pprint(mm)
-
+    #pprint(mm)
     x_np1 = Matrix(np.transpose(np.array(x0)))
-    print("X_n+1 = ")
-    pprint(Matrix(x_np1-mm))
-
+    #pprint(x_np1-mm)
     return list(x_np1-mm)
 
 def norm_inf(x_0,x_1):
@@ -161,39 +152,23 @@ def newton_method(ff,x_0,symbs):
     :param symbs: the symbols that we're using in the function
     :return: the final value of x_0, the list of x values, and the list of y values.
     """
-    system(CLEARW)
-
-    print("METODO DE NEWTON SISTEMAS DE ECUACIONES NO LINEALES")
-
-    print("Aproximación Inicial:")
     pprint(Matrix(x_0))
     xs = []
     ys = []
-    itercount = 0
 
-    while True and itercount < 1000:
-
-        print("ITERACION ", itercount)
+    while True:
         x_1 = NewtonMethod(ff,x_0,symbs)
         #print(x_1)
         ninf = norm_inf(x_0,x_1)
-        print("||X_n+1 - X_n || =",ninf)
         #print(ninf)
-
 
         x_0 = list(x_1)
         xs.append(x_0[0])
         ys.append(x_0[1])
         if ninf < 1e-6:
-            print("||X_n+1 - X_n|| < error (True)")
             break
-        else:
-            print("||X_n+1 - X_n|| < error (False)")
-        itercount = itercount + 1
 
-    print("La Solucion es: ")
-    pprint(Matrix(x_0))
-
+    #print(x_0)
     return x_0,xs,ys
 
 def get_sympy_subplots(plot:Plot):
@@ -1217,8 +1192,7 @@ while True:
 
             slog10_1 = slog10_1 + "Sistema de " +str(len(expr))+"x"+str(len(expr))+'\n'
 
-
-
+            pprint(Matrix(jac))
 
             try:
                 for i in range(0,len(expr)):
@@ -1295,6 +1269,9 @@ while True:
                 window['-LogNewtonNoLinear-'].update("La solucion es: "+'\n\n', append=True)
 
                 window['-LogNewtonNoLinear-'].update(str(solutionL10_1[0])+'\n\n', append=True)
+
+
+
 
 
             #window.Element('-LogNewtonNoLinear-').update(value=slog10_1)

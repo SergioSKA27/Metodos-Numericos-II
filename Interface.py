@@ -14,6 +14,7 @@ from tkinter import *
 from os import system
 import platform
 import os
+import plotly as pll
 
 if platform.system() == 'Linux':
     CLEARW = 'clear'
@@ -21,6 +22,9 @@ elif platform.system() ==  'Windows':
     CLEARW = 'cls'
 
 #This version needs latex(Tex Live) and matplotlib to work properly :)
+
+init_printing()
+
 
 def jacobian(ff,symb):
     """
@@ -117,17 +121,21 @@ def NewtonMethod( ff, x0,symb ):
     #print("Jacobian Matrix")
     #pprint(Matrix(j))
     jev = Matrix( eval_matrix(j,x0,symb))
-    #print("J(",x0,")")
-    #pprint(jev)
+    print("J(",x0,") = ")
+    pprint(jev)
 
     jinv = jev.inv()
-    #print("F(",x0,")")
+    print("J^-1(",x0,") = ")
+    pprint(jinv)
+    print("F(",x0,") = ")
     ffev = Matrix(evalVector(np.transpose(ff),x0,symb))
-    #print("J^-1(",x0,")*","F(",x0,")")
+    pprint(ffev)
+    print("J^-1(",x0,")*","F(",x0,") = ")
     mm = Matrix(jinv)*ffev
-    #pprint(mm)
+    pprint(mm)
     x_np1 = Matrix(np.transpose(np.array(x0)))
-    #pprint(x_np1-mm)
+    print('X_n - J^-1(",x0,")*","F(",x0,") =')
+    pprint(x_np1-mm)
     return list(x_np1-mm)
 
 def norm_inf(x_0,x_1):
@@ -152,21 +160,37 @@ def newton_method(ff,x_0,symbs):
     :param symbs: the symbols that we're using in the function
     :return: the final value of x_0, the list of x values, and the list of y values.
     """
+    system(CLEARW)
+
+    print('-METODO DE NEWTON PARA SISTEMAS DE ECUACIONES NO LINEALES-')
+    print('SISTEMA A RESOLVER')
+    pprint(Matrix(ff))
+    print('APROXIMACION INICIAL')
     pprint(Matrix(x_0))
     xs = []
     ys = []
+    iterra = 0
 
     while True:
+        print('-ITERACIÓN ',iterra,'-')
         x_1 = NewtonMethod(ff,x_0,symbs)
-        #print(x_1)
+
         ninf = norm_inf(x_0,x_1)
-        #print(ninf)
+        asss = 0
+        #for i in range(0, len(x_0)):
+        #    asss = asss + (x_1[i] - x_0[i])**2
+        #print("Iteracion ",iterra,": e_k = ",asss**0.5)
+        pprint('|| X_{n+1} - X_n || = '+str(ninf))
 
         x_0 = list(x_1)
         xs.append(x_0[0])
         ys.append(x_0[1])
+        iterra = iterra+1
         if ninf < 1e-6:
             break
+
+        print('SOLUCIÓN: ')
+        pprint(Matrix(x_0))
 
     #print(x_0)
     return x_0,xs,ys
@@ -216,8 +240,9 @@ def Lagrange(v,fx):
     """
     system(CLEARW)
 
-    print("INTERPOLACION POLINOMICA DE LAGRANGE ")
+    print("---INTERPOLACION POLINOMICA DE LAGRANGE---")
 
+    print('Puntos a Interpolar: ')
     print("x = ")
     pprint(Matrix(v))
     print("f(x) = ")
@@ -226,27 +251,27 @@ def Lagrange(v,fx):
     for i in range(0,len(v)):
         lis.append(li(v,i))
 
-    print("Polinomios de Lagrange (Li)")
+    print("Bases Polinomicas (Li)")
     for i in range(0,len(lis)):
         print("L_"+str(i)+" = ")
-        pprint(lis[i])
+        pprint(expand(lis[i]))
 
     sums = 0
 
     for k in range(0,len(v)):
         sums = sums+(fx[k]*lis[k])
 
-    print("El polinomios de lagrange esta dado por: ")
+    print("El polinomio de Lagrange esta dado por: ")
 
-    simplify(sums)
 
-    pprint(sums)
 
-    p1 = plot(sums,(sums,0,math.pi),(math.pi/2,0),show=False)
+    pprint(expand(sums))
+
+    p1 = plot(sums,(list(sums.free_symbols)[0],min(v) -10 ,max(v)+10),show=False)
     p2 = get_sympy_subplots(p1)
     p2.plot(v,fx,"o")
     p2.show()
-    return sums
+    return expand(sums)
 
 def diff_div(v,fx,order):
     """
@@ -288,6 +313,22 @@ def divided_diff(fx,v):
     #print(m)
     return m
 
+def print_divdiff(v):
+    table = []
+    s = ''
+    for i in range(0,len(v[0])):
+        table.append('|' + str(v[0][i] ) +'|' +str(v[1][i]) +'|')
+        table.append('| ')
+    #print(table)
+    for k in range(2,len(v)):
+        aux = k-1
+        for j in range(0,len(v[k])):
+            table[aux+j] = table[aux+j] +  ('    '*(k))+ str(v[k][j])
+            aux = aux + 1
+    print('|x_k|fx_k|')
+    for t in table:
+        print(t)
+
 def Newton_interpolation(fx,v):
     """
     It takes in a list of x values and a list of f(x) values, and returns a polynomial that interpolates the points
@@ -299,7 +340,10 @@ def Newton_interpolation(fx,v):
 
     system(CLEARW)
 
-    print("INTERPOLACION POLINOMICA DE NEWTON")
+    difdiv = [v,fx]
+
+    print("---INTERPOLACION POLINOMICA DE NEWTON---")
+    print('Datos a Interpolar: ')
     print("x = ")
     pprint(Matrix(v))
     print("f(x) = ")
@@ -311,7 +355,9 @@ def Newton_interpolation(fx,v):
 
     print("Diferencias Divididas: ")
     for i in diff:
-        pprint(Matrix(i))
+        difdiv.append(i)
+
+    print_divdiff(difdiv)
 
     for i in range(0,len(diff)):
         s = diff[i][0]
@@ -326,14 +372,14 @@ def Newton_interpolation(fx,v):
         expr = expr + s
 
     print("El Polinomio de interpolacion esta dado por: ")
-    pprint(expr)
+    pprint(expand(expr))
 
     p = plot(expr,(x,-10,10),show=False)
     p2 = get_sympy_subplots(p)
     p2.plot(v,fx,"o")
     p2.show()
 
-    return expr
+    return expand(expr)
 
 def spline_natural(fx,v):
     """
@@ -345,8 +391,8 @@ def spline_natural(fx,v):
     """
     system(CLEARW)
 
-    print("Interpolacion por medio de Splines Cubicos(Natural)")
-
+    print("---Interpolacion por medio de Splines Cubicos(Natural)---")
+    print('Datos a Interpolar:')
     print("x = ")
     pprint(Matrix(v))
     print("f(x) = ")
@@ -413,7 +459,7 @@ def spline_natural(fx,v):
     x = symbols('x')
     spl = []
     for i in range(0,len(inter)):
-        spl.append(fx[i]+ (b[i]*(x-v[i]))+(c[i]*((x-v[i])**2)) + (d[i]*((x-v[i])**3)))
+        spl.append(expand(fx[i]+ (b[i]*(x-v[i]))+(c[i]*((x-v[i])**2)) + (d[i]*((x-v[i])**3))))
 
     print("Los Splines son: ")
     pprint(Matrix(spl))
@@ -444,7 +490,7 @@ def spline_sujeto(fx,v,fpx0,fpx1 ):
     """
     system(CLEARW)
 
-    print("Interpolacion por medio de Splines Cubicos(Sujeto)")
+    print("---Interpolacion por medio de Splines Cubicos(Sujeto)---")
 
     print("x = ")
     pprint(Matrix(v))
@@ -522,7 +568,7 @@ def spline_sujeto(fx,v,fpx0,fpx1 ):
     x = symbols('x')
     spl = []
     for i in range(0,len(inter)):
-        spl.append(fx[i]+ (b[i]*(x-v[i]))+(c[i]*((x-v[i])**2)) + (d[i]*((x-v[i])**3)))
+        spl.append(expand(fx[i]+ (b[i]*(x-v[i]))+(c[i]*((x-v[i])**2)) + (d[i]*((x-v[i])**3))))
 
     print("Los Splines son: ")
     pprint(Matrix(spl))
@@ -556,7 +602,7 @@ def discrete_minimun_quads_aprox(xs,y,functionss,symbs):
     """
 
     system(CLEARW)
-    print("APROXIMACION DISCRETA POR MINIMOS CUADRADOS")
+    print("---APROXIMACION DISCRETA POR MINIMOS CUADRADOS---")
 
     m = []
 
@@ -630,7 +676,7 @@ def continium_minimun_quads_aprox(fx,interval,symb,degree):
     :return: The function that is the best aproximation of the given function in the given interval.
     """
     system(CLEARW)
-    print("APROXIMACION DISCRETA POR MINIMOS CUADRADOS")
+    print("---APROXIMACION DISCRETA POR MINIMOS CUADRADOS---")
     m = []
 
 
@@ -671,7 +717,9 @@ def continium_minimun_quads_aprox(fx,interval,symb,degree):
     p.show()
 
 
-    return expr
+    return (expr)
+
+
 
 
 
@@ -1163,13 +1211,13 @@ while True:
         try:
             window.Element('-LogNewtonNoLinear-').update(value="")
             eq = parse_system(values['-NoLinearSystemL10_1-'])
-            print(eq)
+            #print(eq)
             expr = []
 
             for i in range(0,len(eq)):
                 expr.append(parse_expr(eq[i]))
 
-            print(expr)
+            #print(expr)
 
             symbs = list(expr[0].free_symbols)
 
@@ -1192,7 +1240,7 @@ while True:
 
             slog10_1 = slog10_1 + "Sistema de " +str(len(expr))+"x"+str(len(expr))+'\n'
 
-            pprint(Matrix(jac))
+            #pprint(Matrix(jac))
 
             try:
                 for i in range(0,len(expr)):
